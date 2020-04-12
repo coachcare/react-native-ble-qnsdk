@@ -1,0 +1,36 @@
+{
+  "name": "react-native-ble-qnsdk",
+  "title": "React Native Ble Qnsdk",
+  "version": "1.0.0",
+  "description": "TODO",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/github_account/react-native-ble-qnsdk.git",
+    "baseUrl": "https://github.com/github_account/react-native-ble-qnsdk"
+  },
+  "keywords": [
+    "react-native"
+  ],
+  "jest": {
+    "preset": "react-native",
+    "modulePathIgnorePatterns": [
+      "<rootDir>/integration-tests",
+      "<rootDir>/node_modules"
+    ]
+  },
+  "author": {
+    "name": "Your Name",
+    "email": "yourname@email.com"
+  },
+  "license": "MIT",
+  "licenseFilename": "LICENSE",
+  "readmeFilename": "README.md",
+  "devDependencies": {
+    "react": "16.9.0",
+    "react-native": "0.61.5"
+  }
+}
