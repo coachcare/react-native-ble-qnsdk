@@ -7,51 +7,40 @@
 
 import Foundation
 import CoreBluetooth
+import PromiseKit
+//import RCTEventEmitter
 
 @objc(QNSDKManager)
-public class QNSDKManager : NSObject, QNLogProtocol {
+public class QNSDKManager : RCTEventEmitter {
     var bleApi: QNBleApi!
-//    var q: QNSDKConnectionDelegate!
-//    weak var delegate : QNSDKConnectionDelegate? = nil
-    var centralManager: CBCentralManager!
     var user: QNUser!
     var device: QNBleDevice!
     var scaleDataAry: [AnyHashable] = []
-//    let state = PublishSubject<String>()
-//
-//    let observable : Observable<String>
-//    private let QNDeviceState: ReplaySubject<String> = "initializing"
-//
-//    override var rating: Int {
-//        get { return super.rating }
-//        set {
-//            super.rating = newValue
-//            ratingSubject.on(.next(super.rating))
-//        }
-//    }
-    public func onLog(_ log: String) {
-        //print("log", log)
+    
+    override public func supportedEvents() -> [String]! {
+        return ["uploadProgress"]
     }
+    
     
     override init() {
         super.init()
         bleApi = QNBleApi.shared()
         let file = Bundle.main.path(forResource: "123456789", ofType: "qn")
         bleApi.initSdk("123456789", firstDataFile: file, callback: { error in })
-        self.buildUser()
         
         bleApi.discoveryListener = self
-        bleApi.logListener = self
         bleApi.connectionChangeListener = self
         bleApi.dataListener = self
     }
     
-    func buildUser() {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy/MM/dd HH:mm"
-        let someDateTime = formatter.date(from: "1986/10/08 22:31")
+    @objc(buildUser:birthday:height:gender:id:unit:)
+    func buildUser(name: String, birthday: String, height: Int, gender: String, id: String, unit: Int) {
+        let dateStr = birthday
+        let dateFormat = DateFormatter()
+        dateFormat.dateFormat = "yyyy/MM/dd"
+        let date = dateFormat.date(from: dateStr)
         
-        self.user = bleApi.buildUser("1", height: 85, gender: "male", birthday: someDateTime, callback: { error in
+        self.user = bleApi.buildUser(id, height: Int32(height), gender: gender, birthday: date, callback: { error in
             if (error != nil) {
                 print("error building user", error)
             } else {
@@ -59,24 +48,32 @@ public class QNSDKManager : NSObject, QNLogProtocol {
             }
             
         })
+        
+        let config = bleApi.getConfig()
+        config?.unit = QNUnit(rawValue: UInt(unit))!
+        
+        
+        
     }
     
     @objc(onStartDiscovery)
     func onStartDiscovery() {
-        print("Jeff: onStartDiscovery")
-        scaleDataAry = []
+        //    return Promise { fulfill, reject in
+        //        let error
         bleApi.startBleDeviceDiscovery({ error in
             // This callback indicates whether the startup scan method is successful
             if((error) != nil) {
                 do {
                     if let error = error {
                         print("Jeff: failed to start the scan method, reason: \(error)")
+                        
                     }
                 }
-            } else {
-                print("Jeff: SDK: startBleDeviceDiscovery success")
             }
         })
+        //        fulf
+        
+        //    }
     }
     
     @objc(onStopDiscovery)
@@ -148,7 +145,8 @@ extension QNSDKManager: QNBleConnectionChangeListener {
     }
     
     public func onConnectError(_ device: QNBleDevice!, error: Error!) {
-        print("jeff: onConnectError", device)
+        print("jeff: onConnectError device", device)
+        print("jeff: onConnectError error", error)
     }
     
 }
@@ -156,22 +154,43 @@ extension QNSDKManager: QNBleConnectionChangeListener {
 extension QNSDKManager: QNScaleDataListener {
     public func onGetUnsteadyWeight(_ device: QNBleDevice!, weight: Double) {
         print("jeff onGetUnsteadyWeight", weight)
+        let jsonObject: [String: Any] = [
+            "status": "sync",
+            "weight": (weight * 1000)
+        ]
+        
+        self.sendEvent(withName: "uploadProgress", body: jsonObject )
+    }
+    
+    public func filterResponse(_ scaleData: [QNScaleItemData]) -> [String:Any]? {
+        var response = [String:Any]()
+        for item in scaleData {
+            if (item.name == "BMR") {
+                response["basalMetabolicRate"] = item.value
+            }
+            if (item.name == "visceral fat") {
+                response["visceralFatTanita"] = item.value
+            }
+            if (item.name == "weight") {
+                response["weight"] = (item.value * 1000)
+            }
+            if (item.name == "lean body weight") {
+                response["fatFreeMass"] = item.value
+            }
+        }
+        
+        return response
+        
     }
     
     public func onGetScaleData(_ device: QNBleDevice!, data scaleData: QNScaleData!) {
-        print("jeff onGetScaleData", scaleData)
+        print("jeff onGetScaleData a", scaleData)
         
+        var data = self.filterResponse(scaleData.getAllItem())
+        data?["status"] = "complete"
         
-        for item in scaleData.getAllItem() {
-            print("item.name")
-            print(item.name)
-            print("item.value")
-            print(item.value)
-            self.scaleDataAry.append(item)
-        }
+        self.sendEvent(withName: "uploadProgress", body: data )
         
-        print("self.scaleDataAry[0")
-        print(self.scaleDataAry[0])
     }
     
     public func onGetStoredScale(_ device: QNBleDevice!, data storedDataList: [QNScaleStoreData]!) {
@@ -193,10 +212,3 @@ extension QNSDKManager: QNScaleDataListener {
     
 }
 
-//extension QNSDKManager : QNSDKConnectionDelegate {
-//    public func onQNDeviceFound() {
-//        print("ONNNNN onQNDeviceFound")
-//    }
-//
-//
-//}

@@ -23,5 +23,6 @@ Pod::Spec.new do |s|
 
   s.dependency "React"
   s.dependency "QNSDK"
+  s.dependency "PromiseKit"
 end
 

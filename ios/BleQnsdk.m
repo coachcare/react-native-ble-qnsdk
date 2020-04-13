@@ -2,6 +2,7 @@
 #import <React/RCTBridgeModule.h>
 
 @interface RCT_EXTERN_MODULE(QNSDKManager, NSObject)
+    RCT_EXTERN_METHOD(buildUser:(NSString *)name birthday:(NSString *)birthday height:(NSInteger *)height gender:(NSString *)gender id:(NSString *)id unit:(NSString *)unit)
     RCT_EXTERN_METHOD(onStartDiscovery)
     RCT_EXTERN_METHOD(onStopDiscovery)
 @end
