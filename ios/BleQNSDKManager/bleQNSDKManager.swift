@@ -61,6 +61,7 @@ public class QNSDKManager : NSObject, QNLogProtocol {
         })
     }
     
+    @objc(onStartDiscovery)
     func onStartDiscovery() {
         print("Jeff: onStartDiscovery")
         scaleDataAry = []
@@ -78,6 +79,7 @@ public class QNSDKManager : NSObject, QNLogProtocol {
         })
     }
     
+    @objc(onStopDiscovery)
     func onStopDiscovery() {
         print("Jeff: onStopDiscovery")
         bleApi.stopBleDeviceDiscorvery({ error in
