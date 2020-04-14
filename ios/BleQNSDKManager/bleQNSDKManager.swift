@@ -7,7 +7,7 @@
 
 import Foundation
 import CoreBluetooth
-import PromiseKit
+
 
 @objc(QNSDKManager)
 public class QNSDKManager : RCTEventEmitter {
@@ -31,9 +31,10 @@ public class QNSDKManager : RCTEventEmitter {
         bleApi.connectionChangeListener = self
         bleApi.dataListener = self
     }
-    
-    @objc(buildUser:birthday:height:gender:id:unit:)
-    func buildUser(name: String, birthday: String, height: Int, gender: String, id: String, unit: Int) {
+
+    @objc(buildUser:birthday:height:gender:id:unit:resolver:rejecter:)
+    func buildUser(name: String, birthday: String, height: Int, gender: String, id: String, unit: Int, resolver resolve: RCTPromiseResolveBlock,
+    rejecter reject: RCTPromiseRejectBlock) {
         let dateStr = birthday
         let dateFormat = DateFormatter()
         dateFormat.dateFormat = "yyyy/MM/dd"
@@ -41,7 +42,6 @@ public class QNSDKManager : RCTEventEmitter {
         
         self.user = bleApi.buildUser(id, height: Int32(height), gender: gender, birthday: date, callback: { error in
             if (error != nil) {
-                
                 print("error building user", error)
             } else {
                 print("No error building user")
@@ -50,11 +50,21 @@ public class QNSDKManager : RCTEventEmitter {
         })
         
         let config = bleApi.getConfig()
-        config?.unit = QNUnit(rawValue: UInt(unit))!
+        let scaleUnit: QNUnit
+        
+        if (unit == 0) {
+            scaleUnit = QNUnit.KG
+        } else {
+            scaleUnit = QNUnit.LB
+        }
+
+        config?.unit = scaleUnit
+        resolve(true)
     }
     
-    @objc(onStartDiscovery)
-    func onStartDiscovery() {
+    @objc(onStartDiscovery:resolver:rejecter:)
+    func onStartDiscovery(name:String, resolve: RCTPromiseResolveBlock,
+    rejecter reject: RCTPromiseRejectBlock) {
         bleApi.startBleDeviceDiscovery({ error in
             // This callback indicates whether the startup scan method is successful
             if((error) != nil) {
@@ -62,16 +72,19 @@ public class QNSDKManager : RCTEventEmitter {
                     if let error = error {
                         print("Jeff: failed to start the scan method, reason: \(error)")
                         
+                    } else {
+                        print("ONE")
                     }
                 }
             }
         })
+         print("TWO")
+        resolve(true)
         
     }
     
     @objc(onStopDiscovery)
     func onStopDiscovery() {
-        print("Jeff: onStopDiscovery")
         bleApi.stopBleDeviceDiscorvery({ error in
             // This callback indicates whether the startup scan method is successful
             if((error) != nil) {
@@ -97,7 +110,7 @@ public class QNSDKManager : RCTEventEmitter {
                     }
                 }
             } else {
-                print("Jeff: SDK: stopBleDeviceDiscorvery success")
+                print("Jeff: SDK: On Connect success")
             }
         })
         
@@ -137,8 +150,11 @@ extension QNSDKManager: QNBleConnectionChangeListener {
     }
     
     public func onConnectError(_ device: QNBleDevice!, error: Error!) {
-        print("jeff: onConnectError device", device)
-        print("jeff: onConnectError error", error)
+        let errorObject: [String: Any] = [
+            "status": "error"
+        ]
+        
+        self.sendEvent(withName: "uploadProgress", body: errorObject )
     }
     
 }
@@ -196,7 +212,37 @@ extension QNSDKManager: QNScaleDataListener {
     }
     
     public func onScaleStateChange(_ device: QNBleDevice!, scaleState state: QNScaleState) {
-        print("jeff onScaleStateChange", state)
+        if (state.rawValue == -1) {
+            print("onScaleStateChange -- QNScaleStateLinkLoss")
+        }
+        else if (state.rawValue == 0){
+            print("onScaleStateChange - QNScaleStateDisconnected")
+        }else if (state.rawValue == 1){
+            print("onScaleStateChange - QNScaleStateConnected")
+            let statusObject: [String: Any] = [
+                "status": "connected"
+            ]
+            
+            self.sendEvent(withName: "uploadProgress", body: statusObject )
+        }
+        else if (state.rawValue == 2){
+           print("onScaleStateChange - QNScaleStateConnecting")
+        }
+        else if (state.rawValue == 3){
+            print("onScaleStateChange - QNScaleStateDisconnecting")
+        }
+        else if (state.rawValue == 4){
+           print("onScaleStateChange - QNScaleStateStartMeasure")
+        }
+        else if (state.rawValue == 5){
+           print("onScaleStateChange - QNScaleStateRealTime")
+        }
+        else if (state.rawValue == 9){
+            print("onScaleStateChange - QNScaleStateMeasureCompleted")
+        }
+   
+        
+
     }
     
     public func onScaleEventChange(_ device: QNBleDevice!, scaleEvent: QNScaleEvent) {
