@@ -8,7 +8,6 @@
 import Foundation
 import CoreBluetooth
 import PromiseKit
-//import RCTEventEmitter
 
 @objc(QNSDKManager)
 public class QNSDKManager : RCTEventEmitter {
@@ -42,6 +41,7 @@ public class QNSDKManager : RCTEventEmitter {
         
         self.user = bleApi.buildUser(id, height: Int32(height), gender: gender, birthday: date, callback: { error in
             if (error != nil) {
+           
                 print("error building user", error)
             } else {
                 print("No error building user")
@@ -51,15 +51,10 @@ public class QNSDKManager : RCTEventEmitter {
         
         let config = bleApi.getConfig()
         config?.unit = QNUnit(rawValue: UInt(unit))!
-        
-        
-        
     }
     
     @objc(onStartDiscovery)
     func onStartDiscovery() {
-        //    return Promise { fulfill, reject in
-        //        let error
         bleApi.startBleDeviceDiscovery({ error in
             // This callback indicates whether the startup scan method is successful
             if((error) != nil) {
@@ -71,9 +66,7 @@ public class QNSDKManager : RCTEventEmitter {
                 }
             }
         })
-        //        fulf
-        
-        //    }
+
     }
     
     @objc(onStopDiscovery)
@@ -94,7 +87,6 @@ public class QNSDKManager : RCTEventEmitter {
     }
     
     func onTryConnect() {
-        print("jeff: onTryConnect")
         self.onStopDiscovery()
         bleApi.connect(self.device, user: self.user, callback: { error in
             // This callback indicates whether the startup scan method is successful
@@ -165,6 +157,7 @@ extension QNSDKManager: QNScaleDataListener {
     public func filterResponse(_ scaleData: [QNScaleItemData]) -> [String:Any]? {
         var response = [String:Any]()
         for item in scaleData {
+
             if (item.name == "BMR") {
                 response["basalMetabolicRate"] = item.value
             }
@@ -175,26 +168,29 @@ extension QNSDKManager: QNScaleDataListener {
                 response["weight"] = (item.value * 1000)
             }
             if (item.name == "lean body weight") {
-                response["fatFreeMass"] = item.value
+                response["fatFreeMass"] = (item.value * 1000)
             }
+            if (item.name == "body fat rate") {
+                response["bodyFat"] = (item.value * 1000)
+            }
+            if (item.name == "body water rate") {
+                response["waterPercentage"] = (item.value * 1000)
+            }
+            
+            
         }
         
         return response
-        
     }
     
     public func onGetScaleData(_ device: QNBleDevice!, data scaleData: QNScaleData!) {
-        print("jeff onGetScaleData a", scaleData)
-        
         var data = self.filterResponse(scaleData.getAllItem())
         data?["status"] = "complete"
-        
+
         self.sendEvent(withName: "uploadProgress", body: data )
-        
     }
     
     public func onGetStoredScale(_ device: QNBleDevice!, data storedDataList: [QNScaleStoreData]!) {
-        print("jeff onGetStoredScale", storedDataList)
     }
     
     public func onGetElectric(_ electric: UInt, device: QNBleDevice!) {
