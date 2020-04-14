@@ -41,7 +41,7 @@ public class QNSDKManager : RCTEventEmitter {
         
         self.user = bleApi.buildUser(id, height: Int32(height), gender: gender, birthday: date, callback: { error in
             if (error != nil) {
-           
+                
                 print("error building user", error)
             } else {
                 print("No error building user")
@@ -66,7 +66,7 @@ public class QNSDKManager : RCTEventEmitter {
                 }
             }
         })
-
+        
     }
     
     @objc(onStopDiscovery)
@@ -145,7 +145,6 @@ extension QNSDKManager: QNBleConnectionChangeListener {
 
 extension QNSDKManager: QNScaleDataListener {
     public func onGetUnsteadyWeight(_ device: QNBleDevice!, weight: Double) {
-        print("jeff onGetUnsteadyWeight", weight)
         let jsonObject: [String: Any] = [
             "status": "sync",
             "weight": (weight * 1000)
@@ -157,7 +156,7 @@ extension QNSDKManager: QNScaleDataListener {
     public func filterResponse(_ scaleData: [QNScaleItemData]) -> [String:Any]? {
         var response = [String:Any]()
         for item in scaleData {
-
+            
             if (item.name == "BMR") {
                 response["basalMetabolicRate"] = item.value
             }
@@ -177,7 +176,6 @@ extension QNSDKManager: QNScaleDataListener {
                 response["waterPercentage"] = (item.value * 1000)
             }
             
-            
         }
         
         return response
@@ -186,7 +184,7 @@ extension QNSDKManager: QNScaleDataListener {
     public func onGetScaleData(_ device: QNBleDevice!, data scaleData: QNScaleData!) {
         var data = self.filterResponse(scaleData.getAllItem())
         data?["status"] = "complete"
-
+        
         self.sendEvent(withName: "uploadProgress", body: data )
     }
     
@@ -204,7 +202,6 @@ extension QNSDKManager: QNScaleDataListener {
     public func onScaleEventChange(_ device: QNBleDevice!, scaleEvent: QNScaleEvent) {
         print("jeff onScaleEventChange", scaleEvent)
     }
-    
     
 }
 
