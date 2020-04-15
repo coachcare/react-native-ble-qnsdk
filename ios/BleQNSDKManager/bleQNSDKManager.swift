@@ -72,13 +72,10 @@ public class QNSDKManager : RCTEventEmitter {
                     if let error = error {
                         print("Jeff: failed to start the scan method, reason: \(error)")
                         
-                    } else {
-                        print("ONE")
-                    }
+                    } 
                 }
             }
         })
-         print("TWO")
         resolve(true)
         
     }
@@ -161,9 +158,18 @@ extension QNSDKManager: QNBleConnectionChangeListener {
 
 extension QNSDKManager: QNScaleDataListener {
     public func onGetUnsteadyWeight(_ device: QNBleDevice!, weight: Double) {
+        var finalWeight = weight * 1000
+        
+        // In order to have the same value for lb's in the app we must convert from lb's to grams
+        if (bleApi.getConfig().unit == QNUnit.LB) {
+            let pounds = bleApi.convertWeight(withTargetUnit: weight, unit: QNUnit.LB)
+            let convertedWeight = 453.59237 * pounds
+            finalWeight = convertedWeight
+        }
+
         let jsonObject: [String: Any] = [
             "status": "sync",
-            "weight": (weight * 1000)
+            "weight": finalWeight
         ]
         
         self.sendEvent(withName: "uploadProgress", body: jsonObject )
@@ -180,7 +186,16 @@ extension QNSDKManager: QNScaleDataListener {
                 response["visceralFatTanita"] = item.value
             }
             if (item.name == "weight") {
-                response["weight"] = (item.value * 1000)
+                var finalWeight = item.value * 1000
+                
+                // In order to have the same value for lb's in the app we must convert from lb's to grams
+                if (bleApi.getConfig().unit == QNUnit.LB) {
+                    let pounds = bleApi.convertWeight(withTargetUnit: item.value, unit: QNUnit.LB)
+                    let convertedWeight = 453.59237 * pounds
+                    finalWeight = convertedWeight
+                }
+                
+                response["weight"] = finalWeight
             }
             if (item.name == "lean body weight") {
                 response["fatFreeMass"] = (item.value * 1000)
