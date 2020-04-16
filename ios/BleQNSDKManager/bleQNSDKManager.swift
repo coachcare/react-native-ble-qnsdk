@@ -32,8 +32,8 @@ public class QNSDKManager : RCTEventEmitter {
         bleApi.dataListener = self
     }
 
-    @objc(buildUser:birthday:height:gender:id:unit:resolver:rejecter:)
-    func buildUser(name: String, birthday: String, height: Int, gender: String, id: String, unit: Int, resolver resolve: RCTPromiseResolveBlock,
+    @objc(buildUser:birthday:height:gender:id:unit:athleteType:resolver:rejecter:)
+    func buildUser(name: String, birthday: String, height: Int, gender: String, id: String, unit: Int, athleteType: Int, resolver resolve: RCTPromiseResolveBlock,
     rejecter reject: RCTPromiseRejectBlock) {
         let dateStr = birthday
         let dateFormat = DateFormatter()
@@ -49,6 +49,13 @@ public class QNSDKManager : RCTEventEmitter {
             
         })
         
+        if (athleteType == 1) {
+            self.user.athleteType = YLAthleteType.sport
+        } else {
+            self.user.athleteType = YLAthleteType.default
+        }
+        
+        //self.user.athleteType = YLAthleteType(rawValue: YLAthleteType.RawValue(athleteType))
         let config = bleApi.getConfig()
         let scaleUnit: QNUnit
         

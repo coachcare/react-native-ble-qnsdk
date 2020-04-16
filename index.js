@@ -7,6 +7,8 @@ class BleQnsdkManager {
     gender
     id
     height
+    unit
+    athleteType
     QnsSDKEmitter = new NativeEventEmitter(BleQnsdk)
 
     buildUser(user) {
@@ -16,8 +18,9 @@ class BleQnsdkManager {
             this.id = user && user.id || "1"
             this.height = user && user.height || 85
             this.unit = user.unit !== undefined ? user.unit : this.unit
+            this.athleteType = user.athleteType !== undefined ? user.athleteType : 0
 
-            BleQnsdk.buildUser("buildUser", this.birthday, this.height, this.gender, this.id, this.unit)
+            BleQnsdk.buildUser("buildUser", this.birthday, this.height, this.gender, this.id, this.unit, this.athleteType)
                 .then(() => fulfill())
                 .catch(() => reject())
         });
