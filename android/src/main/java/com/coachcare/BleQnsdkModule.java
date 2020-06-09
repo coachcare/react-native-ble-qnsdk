@@ -25,7 +25,6 @@ import com.facebook.react.uimanager.IllegalViewOperationException;
 
 import com.coachcare.User;
 
-
 import com.qingniu.qnble.utils.QNLogUtils;
 import com.yolanda.health.qnblesdk.constant.QNUnit;
 import com.yolanda.health.qnblesdk.listener.QNBleConnectionChangeListener;
@@ -289,18 +288,27 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
   public void setDataListener() {
 
     mQNBleApi.setDataListener(new QNScaleDataListener() {
+      public double convertWeight(Double weight) {
+        try {
+          double finalWeight = weight * 1000;
+          if (mQNBleApi.getConfig().getUnit() == QNUnit.WEIGHT_UNIT_LB) {
+            String convertedWeightAsString = mQNBleApi.convertWeightWithTargetUnit(weight,QNUnit.WEIGHT_UNIT_LB);
+            double pounds = Float.valueOf(convertedWeightAsString.split("lb")[0]);
+            double convertedWeight = 453.59237 * pounds;
+            finalWeight = convertedWeight;
+          }
+
+          return finalWeight;
+        } catch(IllegalViewOperationException e) {
+          return weight;
+        }
+
+      };
 
       @Override
       public void onGetUnsteadyWeight(QNBleDevice device, double weight) {
-        double finalWeight = weight * 1000;
         QNConfig mQnConfig = mQNBleApi.getConfig();
-
-        if (mQNBleApi.getConfig().getUnit() == QNUnit.WEIGHT_UNIT_LB) {
-          String convertedWeightAsString = mQNBleApi.convertWeightWithTargetUnit(weight,QNUnit.WEIGHT_UNIT_LB);
-          double pounds = Float.valueOf(convertedWeightAsString.split("lb")[0]);
-          double convertedWeight = 453.59237 * pounds;
-          finalWeight = convertedWeight;
-        }
+        double finalWeight = convertWeight(weight);
 
         WritableMap params = Arguments.createMap();
         params.putDouble("weight", finalWeight);
@@ -315,7 +323,7 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
 
         QNScaleItemData bmrValue = data.getItem(QNIndicator.TYPE_BMR);
         if (bmrValue != null) {
-          Double value = bmrValue.getValue() * 1000;
+          Double value = bmrValue.getValue();
           params.putDouble("basalMetabolicRate", value);
         }
 
@@ -328,13 +336,7 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
 
         QNScaleItemData weightValue = data.getItem(QNIndicator.TYPE_WEIGHT);
         if (weightValue != null) {
-          double finalWeight = weightValue.getValue() * 1000;
-          if (mQNBleApi.getConfig().getUnit() == QNUnit.WEIGHT_UNIT_LB) {
-            String convertedWeightAsString = mQNBleApi.convertWeightWithTargetUnit(weightValue.getValue() ,QNUnit.WEIGHT_UNIT_LB);
-            double pounds = Float.valueOf(convertedWeightAsString.split("lb")[0]);
-            double convertedWeight = 453.59237 * pounds;
-            finalWeight = convertedWeight;
-          }
+          double finalWeight = convertWeight(weightValue.getValue());
 
           params.putDouble("weight", finalWeight);
         }
@@ -453,7 +455,15 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
 
   @ReactMethod
   public void stopScan(Callback callback) {
+    mQNBleApi.stopBleDeviceDiscovery(new QNResultCallback() {
+      @Override
+      public void onResult(int code, String msg) {
+        if (code == CheckStatus.OK.getCode()) {
+          callback.invoke("stopScan: ");
+        }
+      }
+    });
     // TODO: Implement some actually useful functionality
-    callback.invoke("stopScan: ");
+    
   }
 }
