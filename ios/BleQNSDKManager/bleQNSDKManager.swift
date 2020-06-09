@@ -77,7 +77,7 @@ public class QNSDKManager : RCTEventEmitter {
             if((error) != nil) {
                 do {
                     if let error = error {
-                        print("Jeff: failed to start the scan method, reason: \(error)")
+                        print("Failed to start the scan method, reason: \(error)")
                         
                     } 
                 }
@@ -94,11 +94,9 @@ public class QNSDKManager : RCTEventEmitter {
             if((error) != nil) {
                 do {
                     if let error = error {
-                        print("Jeff: failed to stop the scan method, reason: \(error)")
+                        print("Failed to stop the scan method, reason: \(error)")
                     }
                 }
-            } else {
-                print("Jeff: SDK: stopBleDeviceDiscorvery success")
             }
         })
     }
@@ -110,12 +108,10 @@ public class QNSDKManager : RCTEventEmitter {
             if((error) != nil) {
                 do {
                     if let error = error {
-                        print("Jeff: failed to stop the scan method, reason: \(error)")
+                        print("Failed to connect, reason: \(error)")
                     }
                 }
-            } else {
-                print("Jeff: SDK: On Connect success")
-            }
+            } 
         })
         
     }
@@ -125,11 +121,10 @@ public class QNSDKManager : RCTEventEmitter {
 
 extension QNSDKManager: QNBleDeviceDiscoveryListener {
     public func onStartScan() {
-        print("jeffd: on start scan")
+        print("On start scan")
     }
     
     public func onDeviceDiscover(_ device: QNBleDevice!) {
-        print("jeffd: onDeviceDiscover", device)
         self.device = device
         self.onTryConnect()
     }
@@ -138,19 +133,15 @@ extension QNSDKManager: QNBleDeviceDiscoveryListener {
 
 extension QNSDKManager: QNBleConnectionChangeListener {
     public func onConnecting(_ device: QNBleDevice!) {
-        print("jeff: onConnecting", device)
     }
     
     public func onConnected(_ device: QNBleDevice!) {
-        print("jeff: onConnected", device)
     }
     
     public func onServiceSearchComplete(_ device: QNBleDevice!) {
-        print("jeff: onServiceSearchComplete", device)
     }
     
     public func onDisconnecting(_ device: QNBleDevice!) {
-        print("jeff: onDisconnecting", device)
     }
     
     public func onConnectError(_ device: QNBleDevice!, error: Error!) {
@@ -230,7 +221,6 @@ extension QNSDKManager: QNScaleDataListener {
     }
     
     public func onGetElectric(_ electric: UInt, device: QNBleDevice!) {
-        print("jeff onGetElectric", electric)
     }
     
     public func onScaleStateChange(_ device: QNBleDevice!, scaleState state: QNScaleState) {
@@ -268,7 +258,7 @@ extension QNSDKManager: QNScaleDataListener {
     }
     
     public func onScaleEventChange(_ device: QNBleDevice!, scaleEvent: QNScaleEvent) {
-        print("jeff onScaleEventChange", scaleEvent)
+        print("OnScaleEventChange", scaleEvent)
     }
     
 }

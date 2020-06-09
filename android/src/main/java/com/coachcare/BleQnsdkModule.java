@@ -330,7 +330,7 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
         QNScaleItemData visceralFatValue = data.getItem(QNIndicator.TYPE_VISFAT);
         if (visceralFatValue != null) {
 
-          Double value = visceralFatValue.getValue() * 1000;
+          Double value = visceralFatValue.getValue();
           params.putDouble("visceralFatTanita", value);
         }
 
