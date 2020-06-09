@@ -4,22 +4,33 @@ import android.Manifest;
 import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.pm.PackageManager;
+import android.os.Handler;
 import android.text.format.DateUtils;
 import android.util.Log;
 
+import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.LifecycleEventListener;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.Callback;
 import com.facebook.react.bridge.Promise;
+import com.facebook.react.bridge.WritableMap;
+import com.facebook.react.modules.core.DeviceEventManagerModule;
 import com.facebook.react.uimanager.IllegalViewOperationException;
+
+import com.coachcare.User;
+
+
 import com.qingniu.qnble.utils.QNLogUtils;
+import com.yolanda.health.qnblesdk.constant.QNUnit;
 import com.yolanda.health.qnblesdk.listener.QNBleConnectionChangeListener;
-import com.yolanda.health.qnblesdk.listener.QNDataListener;
+//import com.yolanda.health.qnblesdk.listener.QNDataListener;
+import com.yolanda.health.qnblesdk.listener.QNScaleDataListener;
 import com.yolanda.health.qnblesdk.listener.QNResultCallback;
 import com.yolanda.health.qnblesdk.out.QNBleApi;
 import com.yolanda.health.qnblesdk.constant.CheckStatus;
@@ -31,8 +42,10 @@ import com.yolanda.health.qnblesdk.listener.QNResultCallback;
 import com.yolanda.health.qnblesdk.out.QNBleApi;
 import com.yolanda.health.qnblesdk.out.QNBleBroadcastDevice;
 import com.yolanda.health.qnblesdk.out.QNBleDevice;
+import com.yolanda.health.qnblesdk.out.QNBleKitchenDevice;
 import com.yolanda.health.qnblesdk.out.QNConfig;
 import com.yolanda.health.qnblesdk.out.QNScaleData;
+import com.yolanda.health.qnblesdk.out.QNScaleItemData;
 import com.yolanda.health.qnblesdk.out.QNScaleStoreData;
 import com.yolanda.health.qnblesdk.out.QNShareData;
 import com.yolanda.health.qnblesdk.out.QNUser;
@@ -47,21 +60,22 @@ import java.util.List;
 
 public class BleQnsdkModule extends ReactContextBaseJavaModule implements LifecycleEventListener {
 
-    private final ReactApplicationContext reactContext;
-    private QNBleApi mQNBleApi;
+  private final ReactApplicationContext reactContext;
+  private QNBleApi mQNBleApi;
+  public User mUser = new User();
   private boolean loaded = false;
   public static final String FORMAT_SHORT = "yyyy-MM-dd";
 
 
-    public BleQnsdkModule(ReactApplicationContext reactContext) {
+  public BleQnsdkModule(ReactApplicationContext reactContext) {
 
-        super(reactContext);
-        Log.w("Jeff", "on init");
+    super(reactContext);
+    Log.w("Jeff", "on init");
 
-        reactContext.addLifecycleEventListener(this);
-        this.reactContext = reactContext;
+    reactContext.addLifecycleEventListener(this);
+    this.reactContext = reactContext;
 //        this.initialize();
-    }
+  }
 
   public void initialize() {
 
@@ -142,11 +156,71 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
     Log.w("Jeff", "on onHostDestroy");
   }
 
-
-    @Override
-    public String getName() {
-        return "QNSDKManager";
+  private QNUser createQNUser() {
+    UserShape userShape;
+    switch (mUser.getChoseShape()) {
+      case 0:
+        userShape = UserShape.SHAPE_NONE;
+        break;
+      case 1:
+        userShape = UserShape.SHAPE_SLIM;
+        break;
+      case 2:
+        userShape = UserShape.SHAPE_NORMAL;
+        break;
+      case 3:
+        userShape = UserShape.SHAPE_STRONG;
+        break;
+      case 4:
+        userShape = UserShape.SHAPE_PLIM;
+        break;
+      default:
+        userShape = UserShape.SHAPE_NONE;
+        break;
     }
+
+    UserGoal userGoal;
+    switch (mUser.getChoseGoal()) {
+      case 0:
+        userGoal = UserGoal.GOAL_NONE;
+        break;
+      case 1:
+        userGoal = UserGoal.GOAL_LOSE_FAT;
+        break;
+      case 2:
+        userGoal = UserGoal.GOAL_STAY_HEALTH;
+        break;
+      case 3:
+        userGoal = UserGoal.GOAL_GAIN_MUSCLE;
+        break;
+      case 4:
+        userGoal = UserGoal.POWER_OFTEN_EXERCISE;
+        break;
+      case 5:
+        userGoal = UserGoal.POWER_LITTLE_EXERCISE;
+        break;
+      case 6:
+        userGoal = UserGoal.POWER_OFTEN_RUN;
+        break;
+      default:
+        userGoal = UserGoal.GOAL_NONE;
+        break;
+    }
+
+    return mQNBleApi.buildUser(mUser.getUserId(),
+      mUser.getHeight(), mUser.getGender(), mUser.getBirthDay(), mUser.getAthleteType(),
+      userShape, userGoal, mUser.getClothesWeight(), new QNResultCallback() {
+        @Override
+        public void onResult(int code, String msg) {
+          Log.d("ConnectActivity", "创建用户信息返回:" + msg);
+        }
+      });
+  }
+
+  @Override
+  public String getName() {
+    return "QNSDKManager";
+  }
 
 //    @ReactMethod
 //    public void buildUser(String name, int height, String gender, String id, int unit, String athleteType, Callback successCallback, Callback errorCallback) {
@@ -163,12 +237,17 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
 
   @ReactMethod
   public void buildUser(String name, String birthday, int height, String gender, String id, int unit, int athleteType, Promise promise) {
-//    System.out.print ("Jeff: buildUser");
-    Log.w("Jeff", "buildUser");
-
     try {
-        SimpleDateFormat sdf = new SimpleDateFormat(FORMAT_SHORT); // here set the pattern as you date in string was containing like date/month/year
-        Date formattedBirthday = sdf.parse(birthday);
+      SimpleDateFormat sdf = new SimpleDateFormat(FORMAT_SHORT); // here set the pattern as you date in string was containing like date/month/year
+      Date formattedBirthday = sdf.parse(birthday);
+
+      this.mUser.setAthleteType(athleteType);
+      this.mUser.setBirthDay(formattedBirthday);
+      this.mUser.setGender(gender);
+      this.mUser.setHeight(height);
+      this.mUser.setUserId(id);
+
+
       mQNBleApi.buildUser(id,
         height, gender, formattedBirthday, athleteType, new QNResultCallback() {
           @Override
@@ -177,9 +256,9 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
           }
         });
 
-//      this.setConfig();
-      Log.w("Jeff", "no error b");
-      //  "buildUser", this.birthday, this.height, this.gender, this.id, this.unit, this.athleteType
+      QNConfig mQnConfig = mQNBleApi.getConfig();
+      mQnConfig.setUnit(unit);
+
       promise.resolve("build user success");
     } catch (IllegalViewOperationException | ParseException e) {
       Log.w("Jeff", "error");
@@ -213,7 +292,7 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
       ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
       Log.w("Jeff", "IN FIRST ACCESS_FINE_LOCATION");
       return;
-    }else{
+    } else {
       Log.w("Jeff", "IN SECOND ACCESS_FINE_LOCATION");
       // Write you code here if permission already given.
     }
@@ -222,7 +301,7 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
       ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, 1);
       Log.w("Jeff", "IN FIRST ACCESS_COARSE_LOCATION");
       return;
-    }else{
+    } else {
       Log.w("Jeff", "IN SECOND ACCESS_COARSE_LOCATION");
       // Write you code here if permission already given.
     }
@@ -238,6 +317,7 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
         Log.w("Jeff", "onConnecting");
 //        setBleStatus(QNScaleStatus.STATE_CONNECTING);
       }
+
       //connected
       @Override
       public void onConnected(QNBleDevice device) {
@@ -272,69 +352,116 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
         Log.w("Jeff", "onConnectError");
       }
 
-      @Override
-      public void onScaleStateChange(QNBleDevice qnBleDevice, int i) {
-        Log.w("Jeff", "onScaleStateChange");
-      }
+//      @Override
+//      public void onScaleStateChange(QNBleDevice qnBleDevice, int i) {
+//        Log.w("Jeff", "onScaleStateChange");
+//      }
     });
 
+  };
+
+  public void sendEventToJS(String eventName, @Nullable WritableMap params) {
+    this.reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit(eventName, params);
   }
 
   public void setDataListener() {
-    Log.w("Jeff", "setDataListener");
-//    mQNBleApi.setDataListener(new QNDataListener() {
-//      @Override
-//      public void onGetUnsteadyWeight(QNBleDevice device, double weight) {
-//        Log.w("Jeff", "onGetUnsteadyWeight");
-//        Log.w("Jeff", String.valueOf(weight));
-////This method receives unstable weight data. In one measurement, the method will call back multiple times until the data is stable and complete data is obtained.
-//      }
-//
-//      @Override
-//      public void onGetScaleData(QNBleDevice qnBleDevice, QNScaleData qnScaleData) {
-//        Log.w("Jeff", "onGetScaleData");
-//
-//      }
-//
-//
-//
-//      @Override
-//      public void onGetStoredScale(QNBleDevice device, List<QNScaleStoreData> storedDataList) {
-////The method is to receive the storage data at the scale end. The processing method of the stored data can refer to the demo, or you can define it yourself
-//      }
-//
-//      @Override
-//      public void onGetElectric(QNBleDevice device, int electric) {
-//
-////This is the percentage of power obtained. Only the power obtained by the charging scale is meaningful.
-//      }
-//
-//
-//    });
-//    final ReactApplicationContext context = getReactApplicationContext();
-    mQNBleApi.setDataListener(new QNDataListener() {
+
+//    mQNBleApi.setBleConnectionChangeListener(new QNBleConnectionChangeListener() {
+    mQNBleApi.setDataListener(new QNScaleDataListener() {
+
       @Override
       public void onGetUnsteadyWeight(QNBleDevice device, double weight) {
-        Log.w("Jeff", "onGetScaleData");
-//This method receives unstable weight data. In one measurement, the method will call back multiple times until the data is stable and complete data is obtained.
+        double finalWeight = weight * 1000;
+        QNConfig mQnConfig = mQNBleApi.getConfig();
+
+        if (mQNBleApi.getConfig().getUnit() == QNUnit.WEIGHT_UNIT_LB) {
+          String convertedWeightAsString = mQNBleApi.convertWeightWithTargetUnit(weight,QNUnit.WEIGHT_UNIT_LB);
+          double pounds = Float.valueOf(convertedWeightAsString.split("lb")[0]);
+          double convertedWeight = 453.59237 * pounds;
+          finalWeight = convertedWeight;
+        }
+
+        WritableMap params = Arguments.createMap();
+        params.putDouble("weight", finalWeight);
+        params.putString("status", "sync");
+        reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit("uploadProgress", params);
       }
 
       @Override
       public void onGetScaleData(QNBleDevice device, QNScaleData data) {
-//The method is to receive complete measurement data
+        WritableMap params = Arguments.createMap();
+        params.putString("status", "complete");
+//        data.getAllItem();
+        QNScaleItemData bmrValue = data.getItem(QNIndicator.TYPE_BMR);
+        if (bmrValue != null) {
+          Double value = bmrValue.getValue() * 1000;
+          params.putDouble("basalMetabolicRate", value);
+        }
+
+        QNScaleItemData visceralFatValue = data.getItem(QNIndicator.TYPE_VISFAT);
+        if (visceralFatValue != null) {
+
+          Double value = visceralFatValue.getValue() * 1000;
+          params.putDouble("visceralFatTanita", value);
+        }
+
+        QNScaleItemData weightValue = data.getItem(QNIndicator.TYPE_WEIGHT);
+        if (weightValue != null) {
+          double finalWeight = weightValue.getValue() * 1000;
+          if (mQNBleApi.getConfig().getUnit() == QNUnit.WEIGHT_UNIT_LB) {
+            String convertedWeightAsString = mQNBleApi.convertWeightWithTargetUnit(weightValue.getValue() ,QNUnit.WEIGHT_UNIT_LB);
+            double pounds = Float.valueOf(convertedWeightAsString.split("lb")[0]);
+            double convertedWeight = 453.59237 * pounds;
+            finalWeight = convertedWeight;
+          }
+
+          params.putDouble("weight", finalWeight);
+        }
+
+
+        QNScaleItemData leanMassValue = data.getItem(QNIndicator.TYPE_LBM);
+        if (leanMassValue != null) {
+          Double value = leanMassValue.getValue() * 1000;
+          params.putDouble("fatFreeMass", value);
+        }
+
+        QNScaleItemData bodyFatValue = data.getItem(QNIndicator.TYPE_BODYFAT);
+        if (bodyFatValue != null) {
+          Double value = bodyFatValue.getValue() * 1000;
+          params.putDouble("bodyFat", value);
+        }
+
+        QNScaleItemData hydrationValue = data.getItem(QNIndicator.TYPE_WATER);
+        if (hydrationValue != null) {
+          Double value = hydrationValue.getValue() * 1000;
+          params.putDouble("waterPercentage", value);
+        }
+
+        reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit("uploadProgress", params);
       }
 
       @Override
       public void onGetStoredScale(QNBleDevice device, List<QNScaleStoreData> storedDataList) {
-//The method is to receive the storage data at the scale end. The processing method of the stored data can refer to the demo, or you can define it yourself
+//This method is to receive the stored data on the scale side, the processing method of the stored data can refer to the demo, or you can define it yourself
+        Log.w("Jeff", "onGetStoredScale");
       }
 
       @Override
       public void onGetElectric(QNBleDevice device, int electric) {
-//This is the percentage of power obtained. Only the power obtained by the charging scale is meaningful.
+//This is the percentage of electricity obtained, only the electricity obtained by the charging scale is meaningful
+        Log.w("Jeff", "onGetElectric");
       }
 
+      //Connection status during measurement
+      @Override
+      public void onScaleStateChange(QNBleDevice device, int status) {
+        Log.w("Jeff", "setDataListener");
+      }
 
+      @Override
+      public void onScaleEventChange(QNBleDevice qnBleDevice, int i) {
+        Log.w("Jeff", "onScaleEventChange");
+      }
     });
   }
 
@@ -344,6 +471,13 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
       @Override
       public void onDeviceDiscover(QNBleDevice device) {
         Log.w("Jeff", "onDeviceDiscoverr");
+        mQNBleApi.connectDevice(device, createQNUser(), new QNResultCallback() {
+          @Override
+          public void onResult(int code, String msg) {
+            Log.d("onResult", "afdasf:" + msg);
+          }
+        });
+
 //        devices.add(device);
 //        listAdapter.notifyDataSetChanged();
       }
@@ -386,35 +520,40 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
         Log.w("Jeff", "onBroadcastDeviceDiscover");
 
       }
+
+      @Override
+      public void onKitchenDeviceDiscover(QNBleKitchenDevice qnBleKitchenDevice) {
+        Log.w("Jeff", "onKitchenDeviceDiscover");
+      }
     });
   }
 
-    @ReactMethod
-    public void onStartDiscovery(String name, final Promise promise) {
+  @ReactMethod
+  public void onStartDiscovery(String name, final Promise promise) {
+    Activity activity = getCurrentActivity();
+    verifyPermissions(activity);
 
-      Log.w("scan", "code:");
-      Activity activity = getCurrentActivity();
+    Handler mHandler = new Handler();
+    mHandler.post(new Runnable() {
 
-     // ActivityManager am = (ActivityManager)reactContext.getApplicationContext().getSystemService(Activity.ACTIVITY_SERVICE);
-      verifyPermissions(activity);
+      @Override
+      public void run() {
+        mQNBleApi.startBleDeviceDiscovery(new QNResultCallback() {
+          @Override
+          public void onResult(int code, String msg) {
+            if (code != CheckStatus.OK.getCode()) {
+              promise.resolve("Success scan scan: ");
+            }
 
-
-      mQNBleApi.startBleDeviceDiscovery(new QNResultCallback() {
-        @Override
-        public void onResult(int code, String msg) {
-          Log.w("ScanActivity", "code:" + code + ";msg:" + msg);
-          if (code != CheckStatus.OK.getCode()) {
-            promise.resolve("Success scan scan: ");
           }
+        });
+      }
+    });
+  }
 
-        }
-      });
-
-    }
-
-    @ReactMethod
-    public void stopScan(Callback callback) {
-        // TODO: Implement some actually useful functionality
-        callback.invoke("stopScan: ");
-    }
+  @ReactMethod
+  public void stopScan(Callback callback) {
+    // TODO: Implement some actually useful functionality
+    callback.invoke("stopScan: ");
+  }
 }
