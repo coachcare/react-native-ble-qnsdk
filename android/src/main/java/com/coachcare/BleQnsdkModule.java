@@ -454,7 +454,7 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
   }
 
   @ReactMethod
-  public void stopScan(Callback callback) {
+  public void stopScan(final Callback callback) {
     mQNBleApi.stopBleDeviceDiscovery(new QNResultCallback() {
       @Override
       public void onResult(int code, String msg) {
@@ -463,7 +463,6 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
         }
       }
     });
-    // TODO: Implement some actually useful functionality
     
   }
 }
