@@ -25,7 +25,7 @@ public class QNSDKManager : RCTEventEmitter {
         super.init()
         bleApi = QNBleApi.shared()
         let file = Bundle.main.path(forResource: "123456789", ofType: "qn")
-        bleApi.initSdk("123456789", firstDataFile: file, callback: { error in })
+        bleApi.initSdk("Lexington202004", firstDataFile: file, callback: { error in })
         
         bleApi.discoveryListener = self
         bleApi.connectionChangeListener = self
