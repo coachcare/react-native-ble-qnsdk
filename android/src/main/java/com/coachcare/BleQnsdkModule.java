@@ -74,19 +74,14 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
   }
 
   public void initialize() {
+    final ReactApplicationContext context = getReactApplicationContext();
+    mQNBleApi = QNBleApi.getInstance(context);
+    this.setConfig();
 
-    if (this.loaded == false) {
-      final ReactApplicationContext context = getReactApplicationContext();
-      mQNBleApi = QNBleApi.getInstance(context);
-      this.setConfig();
-
-      this.initSDK();
-      this.setDiscoveryListener();
-      this.setConnectionListener();
-      this.setDataListener();
-    }
-
-    this.loaded = true;
+    this.initSDK();
+    this.setDiscoveryListener();
+    this.setConnectionListener();
+    this.setDataListener();
   }
 
   public void setConfig() {
@@ -207,14 +202,7 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
       this.mUser.setHeight(height);
       this.mUser.setUserId(id);
 
-
-      mQNBleApi.buildUser(id,
-        height, gender, formattedBirthday, athleteType, new QNResultCallback() {
-          @Override
-          public void onResult(int code, String msg) {
-            Log.w("Build User", "Build User message:" + msg);
-          }
-        });
+      this.createQNUser();
 
       QNConfig mQnConfig = mQNBleApi.getConfig();
       mQnConfig.setUnit(unit);
@@ -461,6 +449,17 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
         if (code == CheckStatus.OK.getCode()) {
           callback.invoke("stopScan: ");
         }
+      }
+    });
+    
+  }
+
+  @ReactMethod
+  public void onStopDiscovery() {
+    mQNBleApi.stopBleDeviceDiscovery(new QNResultCallback() {
+      @Override
+      public void onResult(int code, String msg) {
+        
       }
     });
     
