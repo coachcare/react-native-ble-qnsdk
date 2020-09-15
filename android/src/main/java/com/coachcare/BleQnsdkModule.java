@@ -301,7 +301,7 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
         WritableMap params = Arguments.createMap();
         params.putDouble("weight", finalWeight);
         params.putString("status", "sync");
-        reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit("uploadProgress", params);
+        sendEventToJS("uploadProgress", params);
       }
 
       @Override
@@ -348,7 +348,7 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
           params.putDouble("waterPercentage", value);
         }
 
-        reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit("uploadProgress", params);
+        sendEventToJS("uploadProgress", params);
       }
 
       @Override
