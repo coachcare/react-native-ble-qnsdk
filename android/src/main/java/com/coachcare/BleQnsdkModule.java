@@ -65,6 +65,7 @@ import com.qn.device.out.QNBleDevice;
 import com.qn.device.out.QNBleKitchenDevice;
 import com.qn.device.out.QNConfig;
 import com.qn.device.out.QNScaleData;
+import com.qn.device.out.QNScaleItemData;
 import com.qn.device.out.QNScaleStoreData;
 import com.qn.device.out.QNShareData;
 import com.qn.device.out.QNUser;
@@ -541,47 +542,45 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
         WritableMap params = Arguments.createMap();
         params.putString("status", "complete");
 
-//        QNScaleItemData bmrValue = data.getItem(QNIndicator.TYPE_BMR);
-//        if (bmrValue != null) {
-//          Double value = bmrValue.getValue();
-//          params.putDouble("basalMetabolicRate", value);
-//        }
-//
-//        QNScaleItemData visceralFatValue = data.getItem(QNIndicator.TYPE_VISFAT);
-//        if (visceralFatValue != null) {
-//
-//          Double value = visceralFatValue.getValue();
-//          params.putDouble("visceralFatTanita", value);
-//        }
-//
-//        QNScaleItemData weightValue = data.getItem(QNIndicator.TYPE_WEIGHT);
-//        if (weightValue != null) {
-//          double finalWeight = convertWeight(weightValue.getValue());
-//
-//          params.putDouble("weight", finalWeight);
-//        }
-//
-//
-//        QNScaleItemData leanMassValue = data.getItem(QNIndicator.TYPE_LBM);
-//        if (leanMassValue != null) {
-//          Double value = leanMassValue.getValue() * 1000;
-//          params.putDouble("fatFreeMass", value);
-//        }
-//
-//        QNScaleItemData bodyFatValue = data.getItem(QNIndicator.TYPE_BODYFAT);
-//        if (bodyFatValue != null) {
-//          Double value = bodyFatValue.getValue() * 1000;
-//          params.putDouble("bodyFat", value);
-//        }
-//
-//        QNScaleItemData hydrationValue = data.getItem(QNIndicator.TYPE_WATER);
-//        if (hydrationValue != null) {
-//          Double value = hydrationValue.getValue() * 1000;
-//          params.putDouble("waterPercentage", value);
-//        }
+        QNScaleItemData bmrValue = data.getItem(QNIndicator.TYPE_BMR);
+        if (bmrValue != null) {
+          Double value = bmrValue.getValue();
+          params.putDouble("basalMetabolicRate", value);
+        }
+
+        QNScaleItemData visceralFatValue = data.getItem(QNIndicator.TYPE_VISFAT);
+        if (visceralFatValue != null) {
+
+          Double value = visceralFatValue.getValue();
+          params.putDouble("visceralFatTanita", value);
+        }
+
+        QNScaleItemData weightValue = data.getItem(QNIndicator.TYPE_WEIGHT);
+        if (weightValue != null) {
+          double finalWeight = convertWeight(weightValue.getValue());
+
+          params.putDouble("weight", finalWeight);
+        }
 
 
-        params.putDouble("weight", 1000);
+        QNScaleItemData leanMassValue = data.getItem(QNIndicator.TYPE_LBM);
+        if (leanMassValue != null) {
+          Double value = leanMassValue.getValue() * 1000;
+          params.putDouble("fatFreeMass", value);
+        }
+
+        QNScaleItemData bodyFatValue = data.getItem(QNIndicator.TYPE_BODYFAT);
+        if (bodyFatValue != null) {
+          Double value = bodyFatValue.getValue() * 1000;
+          params.putDouble("bodyFat", value);
+        }
+
+        QNScaleItemData hydrationValue = data.getItem(QNIndicator.TYPE_WATER);
+        if (hydrationValue != null) {
+          Double value = hydrationValue.getValue() * 1000;
+          params.putDouble("waterPercentage", value);
+        }
+
         sendEventToJS("uploadProgress", params);
       }
 
