@@ -376,6 +376,9 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
       // 断开连接，断开连接后回调
       @Override
       public void onDisconnected(QNBleDevice device) {
+        WritableMap params = Arguments.createMap();
+        params.putString("status", "disconnected");
+        sendEventToJS("uploadProgress", params);
         setBleStatus(QNScaleStatus.STATE_DISCONNECTED);
       }
 
@@ -383,6 +386,9 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
       @Override
       public void onConnectError(QNBleDevice device, int errorCode) {
         Log.d("ConnectActivity", "onConnectError:" + errorCode);
+        WritableMap params = Arguments.createMap();
+        params.putString("status", "error");
+        sendEventToJS("uploadProgress", params);
         setBleStatus(QNScaleStatus.STATE_DISCONNECTED);
       }
 
