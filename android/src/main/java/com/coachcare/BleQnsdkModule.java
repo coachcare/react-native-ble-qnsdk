@@ -26,29 +26,6 @@ import com.facebook.react.uimanager.IllegalViewOperationException;
 import com.coachcare.User;
 
 import com.qingniu.qnble.utils.QNLogUtils;
-//import com.yolanda.health.qnblesdk.constant.QNUnit;
-//import com.yolanda.health.qnblesdk.listener.QNBleConnectionChangeListener;
-//import com.yolanda.health.qnblesdk.listener.QNScaleDataListener;
-//import com.yolanda.health.qnblesdk.listener.QNResultCallback;
-//import com.yolanda.health.qnblesdk.out.QNBleApi;
-//import com.yolanda.health.qnblesdk.constant.CheckStatus;
-//import com.yolanda.health.qnblesdk.constant.QNIndicator;
-//import com.yolanda.health.qnblesdk.constant.UserGoal;
-//import com.yolanda.health.qnblesdk.constant.UserShape;
-//import com.yolanda.health.qnblesdk.listener.QNBleDeviceDiscoveryListener;
-//import com.yolanda.health.qnblesdk.listener.QNResultCallback;
-//import com.yolanda.health.qnblesdk.out.QNBleApi;
-//import com.yolanda.health.qnblesdk.out.QNBleBroadcastDevice;
-//import com.yolanda.health.qnblesdk.out.QNBleDevice;
-//import com.yolanda.health.qnblesdk.out.QNBleKitchenDevice;
-//import com.yolanda.health.qnblesdk.out.QNConfig;
-//import com.yolanda.health.qnblesdk.out.QNScaleData;
-//import com.yolanda.health.qnblesdk.out.QNScaleItemData;
-//import com.yolanda.health.qnblesdk.out.QNScaleStoreData;
-//import com.yolanda.health.qnblesdk.out.QNShareData;
-//import com.yolanda.health.qnblesdk.out.QNUser;
-//import com.yolanda.health.qnblesdk.out.QNUtils;
-//import com.yolanda.health.qnblesdk.out.QNWiFiConfig;
 import com.qn.device.listener.QNScaleDataListener;
 import com.qn.device.listener.QNResultCallback;
 import com.qn.device.out.QNBleApi;
@@ -133,12 +110,6 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
       }
     });
 
-//    mQNBleApi.initSdk("123456789", encryptPath, new QNResultCallback() {
-//      @Override
-//      public void onResult(int code, String msg) {
-//        Log.d("BaseApplication", "初始化文件" + msg);
-//      }
-//    });
   }
 
   @Override
@@ -271,80 +242,7 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
   private void setBleStatus(int bleStatus) {
     String stateString;
     String btnString;
-//    switch (bleStatus) {
-//      case QNScaleStatus.STATE_CONNECTING: {
-//        stateString = getResources().getString(R.string.connecting);
-//        btnString = getResources().getString(R.string.disconnected);
-//        mIsConnected = true;
-//        break;
-//      }
-//      case QNScaleStatus.STATE_CONNECTED: {
-//        stateString = getResources().getString(R.string.connected);
-//        btnString = getResources().getString(R.string.disconnected);
-//        mIsConnected = true;
-//        break;
-//      }
-//      case QNScaleStatus.STATE_DISCONNECTING: {
-//        stateString = getResources().getString(R.string.disconnect_in_progress);
-//        btnString = getResources().getString(R.string.connect);
-//        mIsConnected = false;
-//
-//        break;
-//      }
-//      case QNScaleStatus.STATE_LINK_LOSS: {
-//        stateString = getResources().getString(R.string.connection_disconnected);
-//        btnString = getResources().getString(R.string.connect);
-//        mIsConnected = false;
-//        break;
-//      }
-//      case QNScaleStatus.STATE_START_MEASURE: {
-//        stateString = getResources().getString(R.string.measuring);
-//        btnString = getResources().getString(R.string.disconnected);
-//        break;
-//      }
-//      case QNScaleStatus.STATE_REAL_TIME: {
-//        stateString = getResources().getString(R.string.real_time_weight_measurement);
-//        btnString = getResources().getString(R.string.disconnected);
-//        break;
-//      }
-//      case QNScaleStatus.STATE_BODYFAT: {
-//        stateString = getResources().getString(R.string.impedance_measured);
-//        btnString = getResources().getString(R.string.disconnected);
-//        break;
-//      }
-//      case QNScaleStatus.STATE_HEART_RATE: {
-//        stateString = getResources().getString(R.string.measuring_heart_rate);
-//        btnString = getResources().getString(R.string.disconnected);
-//        break;
-//      }
-//      case QNScaleStatus.STATE_MEASURE_COMPLETED: {
-//        stateString = getResources().getString(R.string.measure_complete);
-//        hmacTest.setText("");
-//        btnString = getResources().getString(R.string.disconnected);
-//        break;
-//      }
-//      case QNScaleStatus.STATE_WIFI_BLE_START_NETWORK:
-//        stateString = getResources().getString(R.string.start_set_wifi);
-//        btnString = getResources().getString(R.string.disconnected);
-//        Log.d("ConnectActivity", "开始设置WiFi");
-//        break;
-//      case QNScaleStatus.STATE_WIFI_BLE_NETWORK_FAIL:
-//        stateString = getResources().getString(R.string.failed_to_set_wifi);
-//        btnString = getResources().getString(R.string.disconnected);
-//        Log.d("ConnectActivity", "设置WiFi失败");
-//        break;
-//      case QNScaleStatus.STATE_WIFI_BLE_NETWORK_SUCCESS:
-//        stateString = getResources().getString(R.string.success_to_set_wifi);
-//        btnString = getResources().getString(R.string.disconnected);
-//        Log.d("ConnectActivity", "设置WiFi成功");
-//        break;
-//      default: {
-//        stateString = getResources().getString(R.string.connection_disconnected);
-//        btnString = getResources().getString(R.string.connect);
-//        mIsConnected = false;
-//        break;
-//      }
-//    }
+
 
   }
 
@@ -391,115 +289,12 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
         sendEventToJS("uploadProgress", params);
         setBleStatus(QNScaleStatus.STATE_DISCONNECTED);
       }
-
     });
   }
 
-//  public void setConnectionListener() {
-//    final ReactApplicationContext context = getReactApplicationContext();
-//    mQNBleApi.setBleConnectionChangeListener(new QNBleConnectionChangeListener() {
-//      @Override
-//      public void onConnecting(QNBleDevice device) {
-//        Log.d("Drakos", "onConnecting ");
-//      }
-//
-//      @Override
-//      public void onConnected(QNBleDevice device) {
-//        Log.d("Drakos", "onConnected ");
-//      }
-//
-//      @Override
-//      public void onServiceSearchComplete(QNBleDevice device) {
-//      }
-//
-//      //The connection is being disconnected. When the disconnection is called, it will be called back immediately.
-//      @Override
-//      public void onDisconnecting(QNBleDevice device) {
-//      }
-//
-//      //Disconnect, callback after disconnect
-//      @Override
-//      public void onDisconnected(QNBleDevice device) {
-//      }
-//
-//      //There was a connection error, please refer to the attached table for the error code
-//      @Override
-//      public void onConnectError(QNBleDevice device, int errorCode) {
-//        Log.d("Drakos", "onConnectError ");
-//      }
-//    });
-//
-//  };
-
   public void sendEventToJS(String eventName, @Nullable WritableMap params) {
-    Log.d("Drakos", "sendEventToJS ");
     this.reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit(eventName, params);
   }
-
-//  private void initUserData() {
-//    mQNBleApi.setDataListener(new QNScaleDataListener() {
-//      @Override
-//      public void onGetUnsteadyWeight(QNBleDevice device, double weight) {
-//        Log.d("ConnectActivity", "体重是:" + weight);
-//        mWeightTv.setText(initWeight(weight));
-//      }
-//
-//      @Override
-//      public void onGetScaleData(QNBleDevice device, QNScaleData data) {
-//        Log.d("ConnectActivity", "收到测量数据");
-//        onReceiveScaleData(data);
-//        QNScaleItemData fatValue = data.getItem(QNIndicator.TYPE_SUBFAT);
-//        if (fatValue != null) {
-//          String value = fatValue.getValue() + "";
-//          Log.d("ConnectActivity", "收到皮下脂肪数据:" + value);
-//        }
-//        currentQNScaleData = data;
-//        historyQNScaleData.add(data);
-//        Log.d("ConnectActivity", "加密hmac为:" + data.getHmac());
-////                Log.d("ConnectActivity", "收到体脂肪:"+data.getItem(QNIndicator.TYPE_BODYFAT).getValue());
-//        doDisconnect();
-//      }
-//
-//      @Override
-//      public void onGetStoredScale(QNBleDevice device, List<QNScaleStoreData> storedDataList) {
-//        Log.d("ConnectActivity", "收到存储数据");
-//        if (storedDataList != null && storedDataList.size() > 0) {
-//          QNScaleStoreData data = storedDataList.get(0);
-//          for (int i = 0; i < storedDataList.size(); i++) {
-//            Log.d("ConnectActivity", "收到存储数据:" + storedDataList.get(i).getWeight());
-//          }
-//          QNUser qnUser = createQNUser();
-//          data.setUser(qnUser);
-//          QNScaleData qnScaleData = data.generateScaleData();
-//          onReceiveScaleData(qnScaleData);
-//          currentQNScaleData = qnScaleData;
-//          historyQNScaleData.add(qnScaleData);
-//        }
-//      }
-//
-//      @Override
-//      public void onGetElectric(QNBleDevice device, int electric) {
-//        String text = "收到电池电量百分比:" + electric;
-//        Log.d("ConnectActivity", text);
-//        if (electric == DecoderConst.NONE_BATTERY_VALUE) {//获取电池信息失败
-//          return;
-//        }
-//        Toast.makeText(ConnectActivity.this, text, Toast.LENGTH_SHORT).show();
-//      }
-//
-//      //测量过程中的连接状态
-//      @Override
-//      public void onScaleStateChange(QNBleDevice device, int status) {
-//        Log.d("ConnectActivity", "秤的连接状态是:" + status);
-//        setBleStatus(status);
-//      }
-//
-//      @Override
-//      public void onScaleEventChange(QNBleDevice device, int scaleEvent) {
-//        Log.d("ConnectActivity", "秤返回的事件是:" + scaleEvent);
-//      }
-//    });
-//  }
 
   public void setDataListener() {
 
