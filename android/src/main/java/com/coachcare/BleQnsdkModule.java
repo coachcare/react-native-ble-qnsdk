@@ -304,16 +304,18 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
           double finalWeight = weight * 1000;
           int unit = mQNBleApi.getConfig().getUnit();
 
+          if (unit == 0) {
+            return finalWeight;
+          } else {
             String convertedWeightAsString = mQNBleApi.convertWeightWithTargetUnit(weight,unit);
             double pounds = Float.valueOf(convertedWeightAsString.split("lb")[0]);
             double convertedWeight = 453.59237 * pounds;
             finalWeight = convertedWeight;
-
-          return finalWeight;
+            return finalWeight;
+          }
         } catch(IllegalViewOperationException e) {
           return weight;
         }
-
       };
 
       @Override
