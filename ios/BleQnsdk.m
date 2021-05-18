@@ -22,7 +22,3 @@ RCT_EXTERN_METHOD(onStartDiscovery:(NSString *)name resolver:(RCTPromiseResolveB
 
 @interface QNSDKManager (RCTExternModule) <RCTBridgeModule>
 @end
-
-@implementation QNSDKManager (RCTExternModule)
-@end
-
