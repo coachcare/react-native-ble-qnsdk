@@ -177,7 +177,6 @@ extension QNSDKManager: QNScaleDataListener {
         var response = [String:Any]()
         for item in scaleData {
             
-            print(item)
             if (item.name == "BMR") {
                 response["basalMetabolicRate"] = item.value
             }
