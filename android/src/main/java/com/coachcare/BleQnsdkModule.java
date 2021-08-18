@@ -320,7 +320,6 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
 
       @Override
       public void onGetUnsteadyWeight(QNBleDevice device, double weight) {
-        Log.d("Drakos", "onGetUnsteadyWeight ");
         QNConfig mQnConfig = mQNBleApi.getConfig();
         double finalWeight = convertWeight(weight);
 
@@ -330,58 +329,60 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
         sendEventToJS("uploadProgress", params);
       }
 
-//      @Override
-//      public void onGetScaleData(QNBleDevice qnBleDevice, QNScaleData qnScaleData) {
-//
-//      }
-
-//      @Override
-//      public void onGetStoredScale(QNBleDevice qnBleDevice, List<QNScaleStoreData> list) {
-//
-//      }
-
       @Override
       public void onGetScaleData(QNBleDevice device, QNScaleData data) {
         WritableMap params = Arguments.createMap();
         params.putString("status", "complete");
 
-        QNScaleItemData bmrValue = data.getItem(QNIndicator.TYPE_BMR);
-        if (bmrValue != null) {
-          Double value = bmrValue.getValue();
-          params.putDouble("basalMetabolicRate", value);
+        QNScaleItemData value = data.getItem(QNIndicator.TYPE_BMR);
+        if (value != null) {
+          params.putDouble("basalMetabolicRate", value.getValue());
         }
 
-        QNScaleItemData visceralFatValue = data.getItem(QNIndicator.TYPE_VISFAT);
-        if (visceralFatValue != null) {
-
-          Double value = visceralFatValue.getValue();
-          params.putDouble("visceralFatTanita", value);
+        value = data.getItem(QNIndicator.TYPE_VISFAT);
+        if (value != null) {
+          params.putDouble("visceralFatTanita", value.getValue());
         }
 
-        QNScaleItemData weightValue = data.getItem(QNIndicator.TYPE_WEIGHT);
-        if (weightValue != null) {
-          double finalWeight = convertWeight(weightValue.getValue());
+        value = data.getItem(QNIndicator.TYPE_WEIGHT);
+        if (value != null) {
+          double finalWeight = convertWeight(value.getValue());
 
           params.putDouble("weight", finalWeight);
         }
 
-
-        QNScaleItemData leanMassValue = data.getItem(QNIndicator.TYPE_LBM);
-        if (leanMassValue != null) {
-          Double value = leanMassValue.getValue() * 1000;
-          params.putDouble("fatFreeMass", value);
+        value = data.getItem(QNIndicator.TYPE_LBM);
+        if (value != null) {
+          params.putDouble("fatFreeMass", value.getValue() * 1000);
         }
 
-        QNScaleItemData bodyFatValue = data.getItem(QNIndicator.TYPE_BODYFAT);
-        if (bodyFatValue != null) {
-          Double value = bodyFatValue.getValue() * 1000;
-          params.putDouble("bodyFat", value);
+        value = data.getItem(QNIndicator.TYPE_BODYFAT);
+        if (value != null) {
+          params.putDouble("bodyFat", value.getValue() * 1000);
         }
 
-        QNScaleItemData hydrationValue = data.getItem(QNIndicator.TYPE_WATER);
-        if (hydrationValue != null) {
-          Double value = hydrationValue.getValue() * 1000;
-          params.putDouble("waterPercentage", value);
+        value = data.getItem(QNIndicator.TYPE_WATER);
+        if (value != null) {
+          params.putDouble("waterPercentage", value.getValue() * 1000);
+        }
+
+        // muscle mass	Muscle mass	Kg
+        value = data.getItem(QNIndicator.TYPE_MUSCLE_MASS);
+        if (value != null) {
+          double finalWeight = convertWeight(value.getValue());
+          params.putDouble("skeletalMuscleMass", finalWeight);
+        }
+
+        // 	Skeletal muscle rate	%
+        value = data.getItem(QNIndicator.TYPE_MUSCLE);
+        if (value != null) {
+          params.putDouble("musclePercentage", value.getValue() * 1000);
+        }
+
+        value = data.getItem(QNIndicator.TYPE_BONE);
+        if (value != null) {
+          double finalWeight = convertWeight(value.getValue());
+          params.putDouble("boneWeight", finalWeight);
         }
 
         sendEventToJS("uploadProgress", params);
@@ -407,16 +408,11 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
 
 
   public void setDiscoveryListener() {
-    Log.d("Drakos", "setDiscoveryListener 1");
-    mQNBleApi.setBleDeviceDiscoveryListener(new QNBleDeviceDiscoveryListener() {
       @Override
       public void onDeviceDiscover(QNBleDevice device) {
-        Log.d("Drakos", "setDiscoveryListener 2");
         mQNBleApi.connectDevice(device, createQNUser(), new QNResultCallback() {
           @Override
           public void onResult(int code, String msg) {
-            Log.d("Drakos", "setDiscoveryListener 3");
-            Log.d("onResult", "afdasf:" + msg);
           }
         });
 
@@ -424,18 +420,13 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
 
       @Override
       public void onStartScan() {
-        Log.d("Drakos", "onStartScan");
-//        QNLogUtils.log("ScanActivity", "onStartScan");
-//        isScanning = true;
       }
 
       @Override
       public void onStopScan() {
-        Log.d("Drakos", "onStopScan");
         mQNBleApi.stopBleDeviceDiscovery(new QNResultCallback() {
           @Override
           public void onResult(int code, String msg) {
-            Log.d("Drakos", "onStopScan2 " + code);
             if (code == CheckStatus.OK.getCode()) {
             }
           }
@@ -464,7 +455,6 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
   public void onStartDiscovery(String name, final Promise promise) {
     Activity activity = getCurrentActivity();
     verifyPermissions(activity);
-    Log.d("Drakos", "onStartDiscovery 1 ");
     Handler mHandler = new Handler();
     mHandler.post(new Runnable() {
 
@@ -473,7 +463,6 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
         mQNBleApi.startBleDeviceDiscovery(new QNResultCallback() {
           @Override
           public void onResult(int code, String msg) {
-            Log.d("Drakos", "onStartDiscovery 2 " + code);
             if (code != CheckStatus.OK.getCode()) {
               promise.resolve("Success scan scan: ");
             }
@@ -486,7 +475,6 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
 
   @ReactMethod
   public void stopScan(final Callback callback) {
-    Log.d("Drakos", "stopScanstopScan ");
     mQNBleApi.stopBleDeviceDiscovery(new QNResultCallback() {
       @Override
       public void onResult(int code, String msg) {
@@ -500,7 +488,6 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
 
   @ReactMethod
   public void onStopDiscovery() {
-    Log.d("Drakos", "onStopDiscovery ");
     mQNBleApi.stopBleDeviceDiscovery(new QNResultCallback() {
       @Override
       public void onResult(int code, String msg) {
