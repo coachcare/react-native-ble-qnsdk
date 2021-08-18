@@ -376,12 +376,7 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
         // 	Skeletal muscle rate	%
         value = data.getItem(QNIndicator.TYPE_MUSCLE);
         if (value != null) {
-          params.putDouble("musclePercentage", value.getValue());
-        }
-
-        value = data.getItem(QNIndicator.TYPE_HEART_RATE);
-        if (value != null) {
-          params.putDouble("heartRate", value.getValue());
+          params.putDouble("musclePercentage", value.getValue() * 1000);
         }
 
         value = data.getItem(QNIndicator.TYPE_BONE);
@@ -413,16 +408,11 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
 
 
   public void setDiscoveryListener() {
-    Log.d("Drakos", "setDiscoveryListener 1");
-    mQNBleApi.setBleDeviceDiscoveryListener(new QNBleDeviceDiscoveryListener() {
       @Override
       public void onDeviceDiscover(QNBleDevice device) {
-        Log.d("Drakos", "setDiscoveryListener 2");
         mQNBleApi.connectDevice(device, createQNUser(), new QNResultCallback() {
           @Override
           public void onResult(int code, String msg) {
-            Log.d("Drakos", "setDiscoveryListener 3");
-            Log.d("onResult", "afdasf:" + msg);
           }
         });
 
@@ -430,18 +420,13 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
 
       @Override
       public void onStartScan() {
-        Log.d("Drakos", "onStartScan");
-//        QNLogUtils.log("ScanActivity", "onStartScan");
-//        isScanning = true;
       }
 
       @Override
       public void onStopScan() {
-        Log.d("Drakos", "onStopScan");
         mQNBleApi.stopBleDeviceDiscovery(new QNResultCallback() {
           @Override
           public void onResult(int code, String msg) {
-            Log.d("Drakos", "onStopScan2 " + code);
             if (code == CheckStatus.OK.getCode()) {
             }
           }
@@ -470,7 +455,6 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
   public void onStartDiscovery(String name, final Promise promise) {
     Activity activity = getCurrentActivity();
     verifyPermissions(activity);
-    Log.d("Drakos", "onStartDiscovery 1 ");
     Handler mHandler = new Handler();
     mHandler.post(new Runnable() {
 
@@ -479,7 +463,6 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
         mQNBleApi.startBleDeviceDiscovery(new QNResultCallback() {
           @Override
           public void onResult(int code, String msg) {
-            Log.d("Drakos", "onStartDiscovery 2 " + code);
             if (code != CheckStatus.OK.getCode()) {
               promise.resolve("Success scan scan: ");
             }
@@ -492,7 +475,6 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
 
   @ReactMethod
   public void stopScan(final Callback callback) {
-    Log.d("Drakos", "stopScanstopScan ");
     mQNBleApi.stopBleDeviceDiscovery(new QNResultCallback() {
       @Override
       public void onResult(int code, String msg) {
@@ -506,7 +488,6 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
 
   @ReactMethod
   public void onStopDiscovery() {
-    Log.d("Drakos", "onStopDiscovery ");
     mQNBleApi.stopBleDeviceDiscovery(new QNResultCallback() {
       @Override
       public void onResult(int code, String msg) {
