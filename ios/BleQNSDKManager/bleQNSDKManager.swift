@@ -177,6 +177,7 @@ extension QNSDKManager: QNScaleDataListener {
         var response = [String:Any]()
         for item in scaleData {
             
+            print(item)
             if (item.name == "BMR") {
                 response["basalMetabolicRate"] = item.value
             }
@@ -203,6 +204,12 @@ extension QNSDKManager: QNScaleDataListener {
             }
             if (item.name == "body water rate") {
                 response["waterPercentage"] = (item.value * 1000)
+            }
+            if (item.name == "muscle rate") {
+                response["musclePercentage"] = (item.value * 1000)
+            }
+            if (item.name == "muscle mass") {
+                response["skeletalMuscleMass"] = (item.value * 1000)
             }
             
         }
