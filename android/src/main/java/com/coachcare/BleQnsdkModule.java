@@ -370,13 +370,13 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
         value = data.getItem(QNIndicator.TYPE_MUSCLE_MASS);
         if (value != null) {
           double finalWeight = convertWeight(value.getValue());
-          params.putDouble("skeletalMuscleMass", finalWeight);
+          params.putDouble("muscleMass", finalWeight);
         }
 
         // 	Skeletal muscle rate	%
         value = data.getItem(QNIndicator.TYPE_MUSCLE);
         if (value != null) {
-          params.putDouble("musclePercentage", value.getValue() * 1000);
+          params.putDouble("skeletalMuscleRatio", value.getValue() * 1000);
         }
 
         value = data.getItem(QNIndicator.TYPE_BONE);

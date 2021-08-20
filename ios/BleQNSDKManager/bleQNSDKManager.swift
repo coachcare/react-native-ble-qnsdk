@@ -205,10 +205,10 @@ extension QNSDKManager: QNScaleDataListener {
                 response["waterPercentage"] = (item.value * 1000)
             }
             if (item.name == "muscle rate") {
-                response["musclePercentage"] = (item.value * 1000)
+                response["skeletalMuscleRatio"] = (item.value * 1000)
             }
             if (item.name == "muscle mass") {
-                response["skeletalMuscleMass"] = (item.value * 1000)
+                response["muscleMass"] = (item.value * 1000)
             }
             
         }
