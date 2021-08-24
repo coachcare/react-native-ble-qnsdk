@@ -408,6 +408,7 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
 
 
   public void setDiscoveryListener() {
+    mQNBleApi.setBleDeviceDiscoveryListener(new QNBleDeviceDiscoveryListener() {
       @Override
       public void onDeviceDiscover(QNBleDevice device) {
         mQNBleApi.connectDevice(device, createQNUser(), new QNResultCallback() {
