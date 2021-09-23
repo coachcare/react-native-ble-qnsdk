@@ -132,6 +132,9 @@ extension QNSDKManager: QNBleDeviceDiscoveryListener {
 }
 
 extension QNSDKManager: QNBleConnectionChangeListener {
+    public func onDisconnected(_ device: QNBleDevice!) {
+        
+    }
     public func onConnecting(_ device: QNBleDevice!) {
     }
     
