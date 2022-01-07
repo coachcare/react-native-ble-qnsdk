@@ -169,6 +169,7 @@ extension QNSDKManager: QNScaleDataListener {
         }
 
         let jsonObject: [String: Any] = [
+            "scaleId": device.modeId,
             "status": "sync",
             "weight": finalWeight
         ]
@@ -222,6 +223,7 @@ extension QNSDKManager: QNScaleDataListener {
     public func onGetScaleData(_ device: QNBleDevice!, data scaleData: QNScaleData!) {
         var data = self.filterResponse(scaleData.getAllItem())
         data?["status"] = "complete"
+        data?["scaleId"] = device.modeId
         
         self.sendEvent(withName: "uploadProgress", body: data )
     }
