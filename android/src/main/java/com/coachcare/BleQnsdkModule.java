@@ -102,7 +102,7 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
   }
 
   public void initSDK() {
-    String encryptPath = "file:///android_asset/123456789.qn";
+    String encryptPath = "file:///android_asset/Lexington202004.qn";
     mQNBleApi.initSdk("Lexington202004", encryptPath, new QNResultCallback() {
       @Override
       public void onResult(int code, String msg) {
@@ -333,6 +333,7 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
       public void onGetScaleData(QNBleDevice device, QNScaleData data) {
         WritableMap params = Arguments.createMap();
         params.putString("status", "complete");
+        params.putString("scaleId", device.getModeId());
 
         QNScaleItemData value = data.getItem(QNIndicator.TYPE_BMR);
         if (value != null) {
