@@ -236,8 +236,6 @@ extension QNSDKManager: QNScaleDataListener {
     
     public func onScaleStateChange(_ device: QNBleDevice!, scaleState state: QNScaleState) {
         if (state.rawValue == -1) {
-            print("onScaleStateChange -- QNScaleStateLinkLoss")
-            print("onScaleStateChange -- DISCONNECT???")
             let errorObject: [String: Any] = [
                 "status": "disconnected"
             ]
