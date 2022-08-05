@@ -107,6 +107,8 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
       @Override
       public void onResult(int code, String msg) {
         Log.d("BaseApplication", "Initialization file\n" + msg);
+        Log.d("drakos init code", String.valueOf(code));
+        Log.d("drakos init msg", msg);
       }
     });
 
@@ -217,6 +219,7 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
   }
 
   public static void verifyPermissions(Activity activity) {
+    Log.w("drakos", "verifyPermissions");
     if (ContextCompat.checkSelfPermission(activity,
       Manifest.permission.ACCESS_COARSE_LOCATION)
       != PackageManager.PERMISSION_GRANTED) {
@@ -237,6 +240,12 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
       return;
     } else {
     }
+
+    if (ActivityCompat.checkSelfPermission(activity, Manifest.permission_group.NEARBY_DEVICES) != PackageManager.PERMISSION_GRANTED) {
+      ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission_group.NEARBY_DEVICES}, 1);
+      return;
+    } else {
+    }
   }
 
   private void setBleStatus(int bleStatus) {
@@ -251,6 +260,7 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
       //正在连接
       @Override
       public void onConnecting(QNBleDevice device) {
+        Log.w("drakos", "onConnecting");
         setBleStatus(QNScaleStatus.STATE_CONNECTING);
       }
 
@@ -268,6 +278,7 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
       //正在断开连接，调用断开连接时，会马上回调
       @Override
       public void onDisconnecting(QNBleDevice device) {
+        Log.w("drakos", "onDisconnecting");
         setBleStatus(QNScaleStatus.STATE_DISCONNECTING);
       }
 
@@ -391,6 +402,7 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
 
       @Override
       public void onGetStoredScale(QNBleDevice device, List<QNScaleStoreData> storedDataList) {
+        Log.w("drakos", "onGetStoredScale");
       }
 
       @Override
@@ -399,10 +411,12 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
 
       @Override
       public void onScaleStateChange(QNBleDevice device, int status) {
+        Log.w("drakos", "onScaleStateChange");
       }
 
       @Override
       public void onScaleEventChange(QNBleDevice qnBleDevice, int i) {
+        Log.w("drakos", "onScaleEventChange");
       }
     });
   }
@@ -412,6 +426,7 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
     mQNBleApi.setBleDeviceDiscoveryListener(new QNBleDeviceDiscoveryListener() {
       @Override
       public void onDeviceDiscover(QNBleDevice device) {
+        Log.w("drakos", "onDeviceDiscover");
         mQNBleApi.connectDevice(device, createQNUser(), new QNResultCallback() {
           @Override
           public void onResult(int code, String msg) {
@@ -422,6 +437,7 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
 
       @Override
       public void onStartScan() {
+        Log.w("drakos", "onStartScan");
       }
 
       @Override
@@ -438,6 +454,7 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
       @Override
       public void onScanFail(int code) {
         Log.w("Scale", "onScanFail");
+        Log.w("Scale", String.valueOf(code));
       }
 
       @Override
@@ -465,6 +482,11 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
         mQNBleApi.startBleDeviceDiscovery(new QNResultCallback() {
           @Override
           public void onResult(int code, String msg) {
+            Log.w("drakos", "startBleDeviceDiscovery");
+            Log.w("drakos", "code");
+            Log.w("drakos", String.valueOf(code));
+            Log.w("drakos", "msg");
+            Log.w("drakos", msg);
             if (code != CheckStatus.OK.getCode()) {
               promise.resolve("Success scan scan: ");
             }
