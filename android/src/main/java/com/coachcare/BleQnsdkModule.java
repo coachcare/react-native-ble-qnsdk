@@ -215,35 +215,6 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
     }
   }
 
-  public static void verifyPermissions(Activity activity) {
-    if (ContextCompat.checkSelfPermission(activity,
-      Manifest.permission.ACCESS_COARSE_LOCATION)
-      != PackageManager.PERMISSION_GRANTED) {
-    }
-    if (ActivityCompat.shouldShowRequestPermissionRationale(activity,
-      Manifest.permission.ACCESS_COARSE_LOCATION)) {
-    }
-
-
-    if (ActivityCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-      ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
-      return;
-    } else {
-    }
-
-    if (ActivityCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-      ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, 1);
-      return;
-    } else {
-    }
-
-    if (ActivityCompat.checkSelfPermission(activity, Manifest.permission_group.NEARBY_DEVICES) != PackageManager.PERMISSION_GRANTED) {
-      ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission_group.NEARBY_DEVICES}, 1);
-      return;
-    } else {
-    }
-  }
-
   private void setBleStatus(int bleStatus) {
     String stateString;
     String btnString;
@@ -460,8 +431,6 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
 
   @ReactMethod
   public void onStartDiscovery(String name, final Promise promise) {
-    Activity activity = getCurrentActivity();
-    verifyPermissions(activity);
     Handler mHandler = new Handler();
     mHandler.post(new Runnable() {
 
