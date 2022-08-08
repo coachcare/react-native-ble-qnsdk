@@ -72,7 +72,6 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
 
     reactContext.addLifecycleEventListener(this);
     this.reactContext = reactContext;
-//    this.initSDK();
   }
 
   public void initialize() {
@@ -216,29 +215,6 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
     }
   }
 
-  public static void verifyPermissions(Activity activity) {
-    if (ContextCompat.checkSelfPermission(activity,
-      Manifest.permission.ACCESS_COARSE_LOCATION)
-      != PackageManager.PERMISSION_GRANTED) {
-    }
-    if (ActivityCompat.shouldShowRequestPermissionRationale(activity,
-      Manifest.permission.ACCESS_COARSE_LOCATION)) {
-    }
-
-
-    if (ActivityCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-      ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
-      return;
-    } else {
-    }
-
-    if (ActivityCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-      ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, 1);
-      return;
-    } else {
-    }
-  }
-
   private void setBleStatus(int bleStatus) {
     String stateString;
     String btnString;
@@ -283,7 +259,6 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
       //出现了连接错误，错误码参考附表
       @Override
       public void onConnectError(QNBleDevice device, int errorCode) {
-        Log.d("ConnectActivity", "onConnectError:" + errorCode);
         WritableMap params = Arguments.createMap();
         params.putString("status", "error");
         sendEventToJS("uploadProgress", params);
@@ -437,26 +412,25 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
 
       @Override
       public void onScanFail(int code) {
-        Log.w("Scale", "onScanFail");
+        WritableMap params = Arguments.createMap();
+        params.putString("status", "error");
+        sendEventToJS("uploadProgress", params);
+        setBleStatus(QNScaleStatus.STATE_DISCONNECTED);
       }
 
       @Override
       public void onBroadcastDeviceDiscover(QNBleBroadcastDevice qnBleBroadcastDevice) {
-        Log.w("Scale", "onBroadcastDeviceDiscover");
 
       }
 
       @Override
       public void onKitchenDeviceDiscover(QNBleKitchenDevice qnBleKitchenDevice) {
-        Log.w("Scale", "onKitchenDeviceDiscover");
       }
     });
   }
 
   @ReactMethod
   public void onStartDiscovery(String name, final Promise promise) {
-    Activity activity = getCurrentActivity();
-    verifyPermissions(activity);
     Handler mHandler = new Handler();
     mHandler.post(new Runnable() {
 
@@ -465,10 +439,9 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
         mQNBleApi.startBleDeviceDiscovery(new QNResultCallback() {
           @Override
           public void onResult(int code, String msg) {
-            if (code != CheckStatus.OK.getCode()) {
-              promise.resolve("Success scan scan: ");
+            if (code == CheckStatus.OK.getCode()) {
+              promise.resolve(true);
             }
-
           }
         });
       }
