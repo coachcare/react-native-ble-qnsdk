@@ -101,13 +101,11 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
   }
 
   public void initSDK() {
-    String encryptPath = "file:///android_asset/Lexington202208.qn";
-    mQNBleApi.initSdk("Lexington202208", encryptPath, new QNResultCallback() {
+    String encryptPath = "file:///android_asset/Lexington202004.qn";
+    mQNBleApi.initSdk("Lexington202004", encryptPath, new QNResultCallback() {
       @Override
       public void onResult(int code, String msg) {
         Log.d("BaseApplication", "Initialization file\n" + msg);
-        Log.d("drakos init code", String.valueOf(code));
-        Log.d("drakos init msg", msg);
       }
     });
 
@@ -272,11 +270,6 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
 
       }
 
-      @Override
-      public void onStartInteracting(QNBleDevice qnBleDevice) {
-        
-      }
-
       //正在断开连接，调用断开连接时，会马上回调
       @Override
       public void onDisconnecting(QNBleDevice device) {
@@ -402,7 +395,6 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
 
       @Override
       public void onGetStoredScale(QNBleDevice device, List<QNScaleStoreData> storedDataList) {
-        Log.w("drakos", "onGetStoredScale");
       }
 
       @Override
@@ -411,17 +403,10 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
 
       @Override
       public void onScaleStateChange(QNBleDevice device, int status) {
-        Log.w("drakos", "onScaleStateChange");
       }
 
       @Override
       public void onScaleEventChange(QNBleDevice qnBleDevice, int i) {
-        Log.w("drakos", "onScaleEventChange");
-      }
-
-      @Override
-      public void readSnComplete(QNBleDevice qnBleDevice, String s) {
-        Log.w("drakos", "readSnComplete");
       }
     });
   }
@@ -441,7 +426,6 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
 
       @Override
       public void onStartScan() {
-        Log.w("drakos", "onStartScan");
       }
 
       @Override
@@ -465,13 +449,11 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
 
       @Override
       public void onBroadcastDeviceDiscover(QNBleBroadcastDevice qnBleBroadcastDevice) {
-        Log.w("Scale", "onBroadcastDeviceDiscover");
 
       }
 
       @Override
       public void onKitchenDeviceDiscover(QNBleKitchenDevice qnBleKitchenDevice) {
-        Log.w("Scale", "onKitchenDeviceDiscover");
       }
     });
   }
