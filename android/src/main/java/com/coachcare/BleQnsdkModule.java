@@ -272,6 +272,11 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
 
       }
 
+      @Override
+      public void onStartInteracting(QNBleDevice qnBleDevice) {
+        
+      }
+
       //正在断开连接，调用断开连接时，会马上回调
       @Override
       public void onDisconnecting(QNBleDevice device) {
@@ -412,6 +417,11 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
       @Override
       public void onScaleEventChange(QNBleDevice qnBleDevice, int i) {
         Log.w("drakos", "onScaleEventChange");
+      }
+
+      @Override
+      public void readSnComplete(QNBleDevice qnBleDevice, String s) {
+        Log.w("drakos", "readSnComplete");
       }
     });
   }
