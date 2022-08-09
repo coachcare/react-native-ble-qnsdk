@@ -101,7 +101,7 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
   }
 
   public void initSDK() {
-    String encryptPath = "file:///android_asset/Lexington202004.qn";
+    String encryptPath = "file:///android_asset/Lexington202208.qn";
     mQNBleApi.initSdk("Lexington202004", encryptPath, new QNResultCallback() {
       @Override
       public void onResult(int code, String msg) {
