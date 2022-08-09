@@ -24,7 +24,7 @@ public class QNSDKManager : RCTEventEmitter {
     override init() {
         super.init()
         bleApi = QNBleApi.shared()
-        let file = Bundle.main.path(forResource: "Lexington202004", ofType: "qn")
+        let file = Bundle.main.path(forResource: "Lexington202208", ofType: "qn")
         bleApi.initSdk("Lexington202004", firstDataFile: file, callback: { error in })
         
         bleApi.discoveryListener = self
