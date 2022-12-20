@@ -1,16 +1,10 @@
 package com.coachcare;
 
-import android.Manifest;
-import android.app.Activity;
-import android.app.ActivityManager;
-import android.content.pm.PackageManager;
+
 import android.os.Handler;
-import android.text.format.DateUtils;
 import android.util.Log;
 
 import androidx.annotation.Nullable;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 
 import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.LifecycleEventListener;
@@ -23,20 +17,14 @@ import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
 import com.facebook.react.uimanager.IllegalViewOperationException;
 
-import com.coachcare.User;
-
-import com.qingniu.qnble.utils.QNLogUtils;
 import com.qn.device.listener.QNScaleDataListener;
 import com.qn.device.listener.QNResultCallback;
 import com.qn.device.out.QNBleApi;
 import com.qn.device.constant.CheckStatus;
-import com.qn.device.constant.QNDeviceType;
 import com.qn.device.constant.QNIndicator;
 import com.qn.device.constant.UserGoal;
 import com.qn.device.constant.UserShape;
 import com.qn.device.listener.QNBleDeviceDiscoveryListener;
-import com.qn.device.listener.QNResultCallback;
-import com.qn.device.out.QNBleApi;
 import com.qn.device.out.QNBleBroadcastDevice;
 import com.qn.device.out.QNBleDevice;
 import com.qn.device.out.QNBleKitchenDevice;
@@ -44,27 +32,20 @@ import com.qn.device.out.QNConfig;
 import com.qn.device.out.QNScaleData;
 import com.qn.device.out.QNScaleItemData;
 import com.qn.device.out.QNScaleStoreData;
-import com.qn.device.out.QNShareData;
 import com.qn.device.out.QNUser;
-import com.qn.device.out.QNUtils;
-import com.qn.device.out.QNWiFiConfig;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import com.qn.device.listener.QNBleConnectionChangeListener;
-import com.qn.device.constant.QNScaleStatus;
-
 
 public class BleQnsdkModule extends ReactContextBaseJavaModule implements LifecycleEventListener {
 
   private final ReactApplicationContext reactContext;
   private QNBleApi mQNBleApi;
   public User mUser = new User();
-  private boolean loaded = false;
   public static final String FORMAT_SHORT = "yyyy-MM-dd";
-
 
   public BleQnsdkModule(ReactApplicationContext reactContext) {
 
@@ -92,23 +73,12 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
     mQnConfig.setDuration(0);
     mQnConfig.setOnlyScreenOn(false);
 
-    mQnConfig.save(new QNResultCallback() {
-      @Override
-      public void onResult(int i, String s) {
-        Log.d("ScanActivity", "initData:" + s);
-      }
-    });
+    mQnConfig.save((i, s) -> Log.d("ScanActivity", "initData:" + s));
   }
 
   public void initSDK() {
     String encryptPath = "file:///android_asset/Lexington202208.qn";
-    mQNBleApi.initSdk("Lexington202004", encryptPath, new QNResultCallback() {
-      @Override
-      public void onResult(int code, String msg) {
-        Log.d("BaseApplication", "Initialization file\n" + msg);
-      }
-    });
-
+    mQNBleApi.initSdk("Lexington202204", encryptPath, (code, msg) -> Log.d("BaseApplication", "Initialization file\n" + code));
   }
 
   @Override
@@ -211,58 +181,84 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
       Log.d("BaseApplication", "buildUser file\n");
       promise.resolve("build user success");
     } catch (IllegalViewOperationException | ParseException e) {
+      Log.d("CATCH ERROR", String.valueOf(e));
+      setBleStatusWithError(e, "Build user error");
       promise.reject("build user reject", e);
     }
   }
 
-  private void setBleStatus(int bleStatus) {
-    String stateString;
-    String btnString;
+  private void setBleStatus(String bleStatus, String deviceId) {
+    WritableMap params = Arguments.createMap();
+    WritableMap item = Arguments.createMap();
+    params.putString("status", bleStatus);
+    params.putString("deviceId", deviceId);
+    item.putMap("connectionStatus", params);
+    sendEventToJS("uploadProgress", item);
+  }
 
+  private void setBleStatus(String bleStatus) {
+    WritableMap params = Arguments.createMap();
+    WritableMap item = Arguments.createMap();
+    params.putString("status", bleStatus);
+    item.putMap("connectionStatus", params);
+    sendEventToJS("uploadProgress", item);
+  }
 
+  private void setBleStatusWithError(Exception error, String description) {
+    WritableMap params = Arguments.createMap();
+    WritableMap item = Arguments.createMap();
+    params.putString("status", "error");
+    params.putString("error", String.valueOf(error));
+    params.putString("description", description);
+    item.putMap("connectionStatus", params);
+    sendEventToJS("uploadProgress", item);
+  }
+
+  private void setBleStatusWithError(int error, String description) {
+    WritableMap params = Arguments.createMap();
+    WritableMap item = Arguments.createMap();
+    params.putString("status", "error");
+    params.putString("error", String.valueOf(error));
+    params.putString("description", description);
+    item.putMap("connectionStatus", params);
+    sendEventToJS("uploadProgress", item);
   }
 
   private void setConnectionListener() {
     mQNBleApi.setBleConnectionChangeListener(new QNBleConnectionChangeListener() {
-      //正在连接
       @Override
       public void onConnecting(QNBleDevice device) {
-        setBleStatus(QNScaleStatus.STATE_CONNECTING);
+        setBleStatus("onConnecting");
       }
 
-      //已连接
       @Override
       public void onConnected(QNBleDevice device) {
-        setBleStatus(QNScaleStatus.STATE_CONNECTED);
+        setBleStatus("onConnected", device.getModeId());
       }
 
       @Override
       public void onServiceSearchComplete(QNBleDevice device) {
-
+        setBleStatus("onServiceSearchComplete");
       }
 
-      //正在断开连接，调用断开连接时，会马上回调
+      @Override
+      public void onStartInteracting(QNBleDevice qnBleDevice) {
+        setBleStatus("onStartInteracting");
+      }
+
       @Override
       public void onDisconnecting(QNBleDevice device) {
-        setBleStatus(QNScaleStatus.STATE_DISCONNECTING);
+        setBleStatus("onDisconnecting");
       }
 
-      // 断开连接，断开连接后回调
       @Override
       public void onDisconnected(QNBleDevice device) {
-        WritableMap params = Arguments.createMap();
-        params.putString("status", "disconnected");
-        sendEventToJS("uploadProgress", params);
-        setBleStatus(QNScaleStatus.STATE_DISCONNECTED);
+        setBleStatus("onDisconnected");
       }
 
-      //出现了连接错误，错误码参考附表
       @Override
       public void onConnectError(QNBleDevice device, int errorCode) {
-        WritableMap params = Arguments.createMap();
-        params.putString("status", "error");
-        sendEventToJS("uploadProgress", params);
-        setBleStatus(QNScaleStatus.STATE_DISCONNECTED);
+        setBleStatusWithError(errorCode, "onConnectError");
       }
     });
   }
@@ -298,17 +294,16 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
         QNConfig mQnConfig = mQNBleApi.getConfig();
         double finalWeight = convertWeight(weight);
 
+        WritableMap measurement = Arguments.createMap();
         WritableMap params = Arguments.createMap();
-        params.putDouble("weight", finalWeight);
-        params.putString("status", "sync");
+        measurement.putDouble("weight", finalWeight);
+        params.putMap("measurement", measurement);
         sendEventToJS("uploadProgress", params);
       }
 
       @Override
       public void onGetScaleData(QNBleDevice device, QNScaleData data) {
         WritableMap params = Arguments.createMap();
-        params.putString("status", "complete");
-        params.putString("scaleId", device.getModeId());
 
         QNScaleItemData value = data.getItem(QNIndicator.TYPE_BMR);
         if (value != null) {
@@ -361,7 +356,10 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
           params.putDouble("boneWeight", finalWeight);
         }
 
-        sendEventToJS("uploadProgress", params);
+        WritableMap measurement = Arguments.createMap();
+        measurement.putMap("measurement", measurement);
+
+        sendEventToJS("uploadProgress", measurement);
       }
 
       @Override
@@ -374,10 +372,18 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
 
       @Override
       public void onScaleStateChange(QNBleDevice device, int status) {
+        WritableMap params = Arguments.createMap();
+        params.putString("scaleStateChange", String.valueOf(status));
+        sendEventToJS("uploadProgress", params);
       }
 
       @Override
       public void onScaleEventChange(QNBleDevice qnBleDevice, int i) {
+      }
+
+      @Override
+      public void readSnComplete(QNBleDevice qnBleDevice, String s) {
+
       }
     });
   }
@@ -412,10 +418,7 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
 
       @Override
       public void onScanFail(int code) {
-        WritableMap params = Arguments.createMap();
-        params.putString("status", "error");
-        sendEventToJS("uploadProgress", params);
-        setBleStatus(QNScaleStatus.STATE_DISCONNECTED);
+        setBleStatusWithError(code, "onScanFail");
       }
 
       @Override
@@ -441,6 +444,9 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
           public void onResult(int code, String msg) {
             if (code == CheckStatus.OK.getCode()) {
               promise.resolve(true);
+            }
+            if (code != CheckStatus.OK.getCode()) {
+              setBleStatusWithError(code, "startBleDeviceDiscovery");
             }
           }
         });
