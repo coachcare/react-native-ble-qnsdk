@@ -73,12 +73,29 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
     mQnConfig.setDuration(0);
     mQnConfig.setOnlyScreenOn(false);
 
-    mQnConfig.save((i, s) -> Log.d("ScanActivity", "initData:" + s));
+    mQnConfig.save(new QNResultCallback() {
+      @Override
+      public void onResult(int i, String s) {
+        Log.d("ScanActivity", "initData:" + s);
+      }
+    });
   }
+
+//  public void initSDK() {
+//    String encryptPath = "file:///android_asset/Lexington202208.qn";
+//    mQNBleApi.initSdk("Lexington202204", encryptPath, (code, msg) -> Log.d("BaseApplication", "Initialization file\n" + code));
+//  }
 
   public void initSDK() {
     String encryptPath = "file:///android_asset/Lexington202208.qn";
-    mQNBleApi.initSdk("Lexington202204", encryptPath, (code, msg) -> Log.d("BaseApplication", "Initialization file\n" + code));
+    mQNBleApi.initSdk("Lexington202004", encryptPath, new QNResultCallback() {
+      @Override
+      public void onResult(int code, String msg) {
+        Log.d("BaseApplication", "Initialization file\n" + msg);
+        Log.d("BaseApplication", "Initialization code\n" + code);
+      }
+    });
+
   }
 
   @Override
@@ -99,9 +116,6 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
   private QNUser createQNUser() {
     UserShape userShape;
     switch (mUser.getChoseShape()) {
-      case 0:
-        userShape = UserShape.SHAPE_NONE;
-        break;
       case 1:
         userShape = UserShape.SHAPE_SLIM;
         break;
@@ -442,12 +456,15 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
         mQNBleApi.startBleDeviceDiscovery(new QNResultCallback() {
           @Override
           public void onResult(int code, String msg) {
+            Log.d("onResult code ", String.valueOf(code));
+            Log.d("onResult mesg", String.valueOf(code));
             if (code == CheckStatus.OK.getCode()) {
               promise.resolve(true);
             }
-            if (code != CheckStatus.OK.getCode()) {
-              setBleStatusWithError(code, "startBleDeviceDiscovery");
-            }
+//            if (code != CheckStatus.OK.getCode()) {
+//              setBleStatusWithError(code, "startBleDeviceDiscovery");
+////              promise.reject(String.valueOf(code));
+//            }
           }
         });
       }
