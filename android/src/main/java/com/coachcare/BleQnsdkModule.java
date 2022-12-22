@@ -258,7 +258,11 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
 
             @Override
             public void onDisconnected(QNBleDevice device) {
-                setBleStatus("onDisconnected");
+                WritableMap params = Arguments.createMap();
+                params.putString("scaleStateChange", "0");
+                sendEventToJS("uploadProgress", params);
+
+                setBleStatus("disconnected");
             }
 
             @Override
@@ -369,10 +373,12 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
 
             @Override
             public void onGetStoredScale(QNBleDevice device, List<QNScaleStoreData> storedDataList) {
+                Log.d("onGetStoredScale ", String.valueOf(storedDataList));
             }
 
             @Override
             public void onGetElectric(QNBleDevice device, int electric) {
+                Log.d("onGetElectric ", String.valueOf(electric));
             }
 
             @Override
@@ -454,7 +460,6 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
                         }
                         if (code != CheckStatus.OK.getCode()) {
                           setBleStatusWithError(code, "startBleDeviceDiscovery");
-                          promise.reject(String.valueOf(code));
                         }
                     }
                 });
