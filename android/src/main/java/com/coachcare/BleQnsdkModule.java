@@ -65,6 +65,16 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
         this.setDataListener();
     }
 
+    public void initializeListeners() {
+      final ReactApplicationContext context = getReactApplicationContext();
+      mQNBleApi = QNBleApi.getInstance(context);
+      this.setConfig();
+
+      this.setDiscoveryListener();
+      this.setConnectionListener();
+      this.setDataListener();
+    }
+
     public void setConfig() {
         QNConfig mQnConfig = mQNBleApi.getConfig();
         mQnConfig.setNotCheckGPS(true);
@@ -94,6 +104,7 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
 
     @Override
     public void onHostResume() {
+      this.initializeListeners();
       Log.w("Scale", "on onHostResume");
     }
 
