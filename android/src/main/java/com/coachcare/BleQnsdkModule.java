@@ -94,7 +94,7 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
 
     @Override
     public void onHostResume() {
-        this.initialize();
+      Log.w("Scale", "on onHostResume");
     }
 
     @Override
@@ -186,7 +186,6 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
             Log.d("BaseApplication", "buildUser file\n");
             promise.resolve("build user success");
         } catch (IllegalViewOperationException | ParseException e) {
-            Log.d("CATCH ERROR", String.valueOf(e));
             setBleStatusWithError(e, "Build user error");
             promise.reject("build user reject", e);
         }
@@ -245,11 +244,11 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
             public void onServiceSearchComplete(QNBleDevice device) {
                 setBleStatus("onServiceSearchComplete");
             }
-// Leaving this here for SDK update
-//      @Override
-//      public void onStartInteracting(QNBleDevice qnBleDevice) {
-//        setBleStatus("onStartInteracting");
-//      }
+
+            @Override
+            public void onStartInteracting(QNBleDevice qnBleDevice) {
+              setBleStatus("onStartInteracting");
+            }
 
             @Override
             public void onDisconnecting(QNBleDevice device) {
@@ -391,11 +390,11 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
             @Override
             public void onScaleEventChange(QNBleDevice qnBleDevice, int i) {
             }
-// Leaving this here for SDK update
-//      @Override
-//      public void readSnComplete(QNBleDevice qnBleDevice, String s) {
-//
-//      }
+
+            @Override
+            public void readSnComplete(QNBleDevice qnBleDevice, String s) {
+
+            }
         });
     }
 
