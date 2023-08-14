@@ -1,6 +1,5 @@
 package com.coachcare;
 
-
 import android.os.Handler;
 import android.util.Log;
 
@@ -65,6 +64,16 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
         this.setDataListener();
     }
 
+    public void initializeListeners() {
+        final ReactApplicationContext context = getReactApplicationContext();
+        mQNBleApi = QNBleApi.getInstance(context);
+        this.setConfig();
+
+        this.setDiscoveryListener();
+        this.setConnectionListener();
+        this.setDataListener();
+    }
+
     public void setConfig() {
         QNConfig mQnConfig = mQNBleApi.getConfig();
         mQnConfig.setNotCheckGPS(true);
@@ -75,7 +84,7 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
         mQnConfig.save(new QNResultCallback() {
             @Override
             public void onResult(int i, String s) {
-                Log.d("ScanActivity", "initData:" + s);
+                Log.d("Yolanda Scale ScanActivity", "initData:" + s);
             }
         });
     }
@@ -85,8 +94,8 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
         mQNBleApi.initSdk("Lexington202004", encryptPath, new QNResultCallback() {
             @Override
             public void onResult(int code, String msg) {
-                Log.d("BaseApplication", "Initialization file\n" + msg);
-                Log.d("BaseApplication", "Initialization code\n" + code);
+                Log.d("Yolanda Scale", "Initialization file\n" + msg);
+                Log.d("Yolanda Scale", "Initialization code\n" + code);
             }
         });
 
@@ -94,17 +103,18 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
 
     @Override
     public void onHostResume() {
-        this.initialize();
+        this.initializeListeners();
+        Log.w("Yolanda Scale", "on onHostResume");
     }
 
     @Override
     public void onHostPause() {
-        Log.w("Scale", "on onHostPause");
+        Log.w("Yolanda Scale", "on onHostPause");
     }
 
     @Override
     public void onHostDestroy() {
-        Log.w("S", "on onHostDestroy");
+        Log.w("Yolanda Scale", "on onHostDestroy");
     }
 
     private QNUser createQNUser() {
@@ -157,7 +167,7 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
                 userShape, userGoal, mUser.getClothesWeight(), new QNResultCallback() {
                     @Override
                     public void onResult(int code, String msg) {
-                        Log.d("ConnectActivity", "Response:" + msg);
+                        Log.d("Yolanda Scale ConnectActivity", "Response:" + msg);
                     }
                 });
     }
@@ -168,9 +178,11 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
     }
 
     @ReactMethod
-    public void buildUser(String name, String birthday, int height, String gender, String id, int unit, int athleteType, Promise promise) {
+    public void buildUser(String name, String birthday, int height, String gender, String id, int unit, int athleteType,
+            Promise promise) {
         try {
-            SimpleDateFormat sdf = new SimpleDateFormat(FORMAT_SHORT); // here set the pattern as you date in string was containing like date/month/year
+            SimpleDateFormat sdf = new SimpleDateFormat(FORMAT_SHORT); // here set the pattern as you date in string was
+                                                                       // containing like date/month/year
             Date formattedBirthday = sdf.parse(birthday);
 
             this.mUser.setAthleteType(athleteType);
@@ -183,10 +195,10 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
 
             QNConfig mQnConfig = mQNBleApi.getConfig();
             mQnConfig.setUnit(unit);
-            Log.d("BaseApplication", "buildUser file\n");
+            Log.d("Yolanda Scale", "buildUser file\n");
             promise.resolve("build user success");
         } catch (IllegalViewOperationException | ParseException e) {
-            Log.d("CATCH ERROR", String.valueOf(e));
+            Log.d("Yolanda Scale CATCH ERROR", String.valueOf(e));
             setBleStatusWithError(e, "Build user error");
             promise.reject("build user reject", e);
         }
@@ -245,11 +257,12 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
             public void onServiceSearchComplete(QNBleDevice device) {
                 setBleStatus("onServiceSearchComplete");
             }
-// Leaving this here for SDK update
-//      @Override
-//      public void onStartInteracting(QNBleDevice qnBleDevice) {
-//        setBleStatus("onStartInteracting");
-//      }
+
+            @Override
+            public void onStartInteracting(QNBleDevice qnBleDevice) {
+                Log.w("Yolanda Scale", "on onStartInteracting");
+                setBleStatus("onStartInteracting");
+            }
 
             @Override
             public void onDisconnecting(QNBleDevice device) {
@@ -346,14 +359,14 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
                     params.putDouble("waterPercentage", value.getValue() * 1000);
                 }
 
-                // muscle mass	Muscle mass	Kg
+                // muscle mass Muscle mass Kg
                 value = data.getItem(QNIndicator.TYPE_MUSCLE_MASS);
                 if (value != null) {
                     double finalWeight = convertWeight(value.getValue());
                     params.putDouble("muscleMass", finalWeight);
                 }
 
-                // 	Skeletal muscle rate	%
+                // Skeletal muscle rate %
                 value = data.getItem(QNIndicator.TYPE_MUSCLE);
                 if (value != null) {
                     params.putDouble("skeletalMuscleRatio", value.getValue() * 1000);
@@ -373,12 +386,12 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
 
             @Override
             public void onGetStoredScale(QNBleDevice device, List<QNScaleStoreData> storedDataList) {
-                Log.d("onGetStoredScale ", String.valueOf(storedDataList));
+                Log.d("Yolanda Scale onGetStoredScale ", String.valueOf(storedDataList));
             }
 
             @Override
             public void onGetElectric(QNBleDevice device, int electric) {
-                Log.d("onGetElectric ", String.valueOf(electric));
+                Log.d("Yolanda Scale onGetElectric ", String.valueOf(electric));
             }
 
             @Override
@@ -391,14 +404,13 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
             @Override
             public void onScaleEventChange(QNBleDevice qnBleDevice, int i) {
             }
-// Leaving this here for SDK update
-//      @Override
-//      public void readSnComplete(QNBleDevice qnBleDevice, String s) {
-//
-//      }
+            // Leaving this here for SDK update
+            // @Override
+            // public void readSnComplete(QNBleDevice qnBleDevice, String s) {
+            //
+            // }
         });
     }
-
 
     public void setDiscoveryListener() {
         mQNBleApi.setBleDeviceDiscoveryListener(new QNBleDeviceDiscoveryListener() {
@@ -453,13 +465,13 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
                 mQNBleApi.startBleDeviceDiscovery(new QNResultCallback() {
                     @Override
                     public void onResult(int code, String msg) {
-                        Log.d("onResult code ", String.valueOf(code));
-                        Log.d("onResult mesg", String.valueOf(code));
+                        Log.d("Yolanda Scale onResult code ", String.valueOf(code));
+                        Log.d("Yolanda Scale onResult mesg", String.valueOf(code));
                         if (code == CheckStatus.OK.getCode()) {
                             promise.resolve(true);
                         }
                         if (code != CheckStatus.OK.getCode()) {
-                          setBleStatusWithError(code, "startBleDeviceDiscovery");
+                            setBleStatusWithError(code, "startBleDeviceDiscovery");
                         }
                     }
                 });

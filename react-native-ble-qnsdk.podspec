@@ -10,17 +10,14 @@ Pod::Spec.new do |s|
                   react-native-ble-qnsdk
                    DESC
   s.homepage = "https://github.com/coachcare/react-native-ble-qnsdk"
-  # brief license entry:
   s.license = "MIT"
-  # optional - use expanded license entry instead:
-  # s.license    = { :type => "MIT", :file => "LICENSE" }
   s.authors = { "Jeff Drakos" => "jeffdrakos@gmail.com" }
-  s.platforms = { :ios => "9.0" }
+  s.platforms = { :ios => "11.0" }
   s.source = { :git => "https://github.com/coachcare/react-native-ble-qnsdk.git", :tag => "#{s.version}" }
 
   s.source_files = "ios/**/*.{h,m,swift}"
   s.requires_arc = true
 
   s.dependency "React"
-  s.dependency "QNSDK"
+  s.dependency "QNSDK", "3.10.8"
 end
