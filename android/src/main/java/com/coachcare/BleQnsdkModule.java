@@ -1,6 +1,7 @@
 package com.coachcare;
 
 import android.os.Handler;
+import android.os.HandlerThread;
 import android.util.Log;
 
 import com.facebook.react.bridge.Arguments;
@@ -45,28 +46,31 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
     public User mUser = new User();
     public static final String FORMAT_SHORT = "yyyy-MM-dd";
 
-    public BleQnsdkModule(ReactApplicationContext reactContext) {
+    private Handler backgroundHandler;
 
+    public BleQnsdkModule(ReactApplicationContext reactContext) {
         super(reactContext);
 
         reactContext.addLifecycleEventListener(this);
         this.reactContext = reactContext;
-    }
 
-    public void initialize() {
-        final ReactApplicationContext context = getReactApplicationContext();
-        mQNBleApi = QNBleApi.getInstance(context);
-        this.setConfig();
+       HandlerThread handlerThread = new HandlerThread("BleQnsdkModuleInit");
+       handlerThread.start();
+       backgroundHandler = new Handler(handlerThread.getLooper());
 
-        this.initSDK();
-        this.setDiscoveryListener();
-        this.setConnectionListener();
-        this.setDataListener();
+       // Move initialization to the background thread
+       backgroundHandler.post(() -> {
+        //    mQNBleApi = QNBleApi.getInstance(reactContext);
+        //    initSDK();
+        this.initializeListeners();
+       });
     }
 
     public void initializeListeners() {
-        final ReactApplicationContext context = getReactApplicationContext();
-        mQNBleApi = QNBleApi.getInstance(context);
+        Log.d("Yolanda Scale", "initializeListeners \n");
+
+        mQNBleApi = QNBleApi.getInstance(reactContext);
+        initSDK();
         this.setConfig();
 
         this.setDiscoveryListener();
@@ -84,7 +88,7 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
         mQnConfig.save(new QNResultCallback() {
             @Override
             public void onResult(int i, String s) {
-                Log.d("Yolanda Scale ScanActivity", "initData:" + s);
+                Log.d("Yolanda setConfig", "initData:" + s);
             }
         });
     }
@@ -103,7 +107,7 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
 
     @Override
     public void onHostResume() {
-        this.initializeListeners();
+        // this.initializeListeners();
         Log.w("Yolanda Scale", "on onHostResume");
     }
 
@@ -167,7 +171,7 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
                 userShape, userGoal, mUser.getClothesWeight(), new QNResultCallback() {
                     @Override
                     public void onResult(int code, String msg) {
-                        Log.d("Yolanda Scale ConnectActivity", "Response:" + msg);
+                        Log.d("Yolanda ConnectActivity", "Response:" + msg);
                     }
                 });
     }
@@ -198,7 +202,7 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
             Log.d("Yolanda Scale", "buildUser file\n");
             promise.resolve("build user success");
         } catch (IllegalViewOperationException | ParseException e) {
-            Log.d("Yolanda Scale CATCH ERROR", String.valueOf(e));
+            Log.d("Yolanda CATCH ERROR", String.valueOf(e));
             setBleStatusWithError(e, "Build user error");
             promise.reject("build user reject", e);
         }
@@ -386,12 +390,12 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
 
             @Override
             public void onGetStoredScale(QNBleDevice device, List<QNScaleStoreData> storedDataList) {
-                Log.d("Yolanda Scale onGetStoredScale ", String.valueOf(storedDataList));
+                Log.d("Yolanda onGetStordScale", String.valueOf(storedDataList));
             }
 
             @Override
             public void onGetElectric(QNBleDevice device, int electric) {
-                Log.d("Yolanda Scale onGetElectric ", String.valueOf(electric));
+                Log.d("Yolanda onGetElectric ", String.valueOf(electric));
             }
 
             @Override
@@ -403,12 +407,15 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
 
             @Override
             public void onScaleEventChange(QNBleDevice qnBleDevice, int i) {
+                Log.d("Yolanda onEventChange", String.valueOf(qnBleDevice));
             }
-            // Leaving this here for SDK update
-            // @Override
-            // public void readSnComplete(QNBleDevice qnBleDevice, String s) {
-            //
-            // }
+
+            @Override
+            public void readSnComplete(QNBleDevice qnBleDevice, String s) {
+                Log.d("Yolanda readSnComplete", String.valueOf(qnBleDevice));
+
+            }
+
         });
     }
 
@@ -419,6 +426,7 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
                 mQNBleApi.connectDevice(device, createQNUser(), new QNResultCallback() {
                     @Override
                     public void onResult(int code, String msg) {
+                        Log.d("Yolanda onDevDiscover", String.valueOf(device));
                     }
                 });
 
@@ -426,13 +434,17 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
 
             @Override
             public void onStartScan() {
+                Log.d("Yolanda onStartScan", "start");
             }
 
             @Override
             public void onStopScan() {
                 mQNBleApi.stopBleDeviceDiscovery(new QNResultCallback() {
+
                     @Override
                     public void onResult(int code, String msg) {
+                        Log.d("Yolanda onStopScan c", String.valueOf(code));
+                        Log.d("Yolanda onStopScan m", String.valueOf(msg));
                         if (code == CheckStatus.OK.getCode()) {
                         }
                     }
@@ -441,16 +453,19 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
 
             @Override
             public void onScanFail(int code) {
+                Log.d("Yolanda onScanFail", String.valueOf(code));
                 setBleStatusWithError(code, "onScanFail");
             }
 
             @Override
             public void onBroadcastDeviceDiscover(QNBleBroadcastDevice qnBleBroadcastDevice) {
+                Log.d("Yolanda onBrodDiscover", String.valueOf(qnBleBroadcastDevice));
 
             }
 
             @Override
             public void onKitchenDeviceDiscover(QNBleKitchenDevice qnBleKitchenDevice) {
+                Log.d("Yolanda onKitchDiscover", String.valueOf(qnBleKitchenDevice));
             }
         });
     }
@@ -462,11 +477,12 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
 
             @Override
             public void run() {
+                Log.d("Yolanda onStartDscovery", String.valueOf(name));
                 mQNBleApi.startBleDeviceDiscovery(new QNResultCallback() {
                     @Override
                     public void onResult(int code, String msg) {
-                        Log.d("Yolanda Scale onResult code ", String.valueOf(code));
-                        Log.d("Yolanda Scale onResult mesg", String.valueOf(code));
+                        Log.d("Yolanda onResult code ", String.valueOf(code));
+                        Log.d("Yolanda onResult mesg", String.valueOf(msg));
                         if (code == CheckStatus.OK.getCode()) {
                             promise.resolve(true);
                         }
@@ -484,6 +500,8 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
         mQNBleApi.stopBleDeviceDiscovery(new QNResultCallback() {
             @Override
             public void onResult(int code, String msg) {
+                Log.d("Yolanda stopScan c", String.valueOf(code));
+                Log.d("Yolanda stopScan m", String.valueOf(msg));
                 if (code == CheckStatus.OK.getCode()) {
                     callback.invoke("stopScan: ");
                 }

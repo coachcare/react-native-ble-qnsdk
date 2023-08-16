@@ -7,8 +7,15 @@ Pod::Spec.new do |s|
   s.version = package["version"]
   s.summary = package["description"]
   s.description = <<-DESC
-                  react-native-ble-qnsdk
-                   DESC
+    YolandaSync is a powerful Bluetooth communication library designed to simplify the process of synchronizing data with Yolanda scales. With a seamless integration into your app, YolandaSync allows you to effortlessly connect to Yolanda scales over Bluetooth and retrieve measurement data with just a few lines of code.
+
+    Key Features:
+    - Streamlined Bluetooth pairing and communication with Yolanda scales.
+    - Retrieve precise weight and measurement data with ease.
+    - Seamlessly integrate weight measurements into your app's workflow.
+
+    GitHub: https://github.com/coachcare/react-native-ble-qnsdk
+  DESC
   s.homepage = "https://github.com/coachcare/react-native-ble-qnsdk"
   s.license = "MIT"
   s.authors = { "Jeff Drakos" => "jeffdrakos@gmail.com" }
@@ -19,5 +26,5 @@ Pod::Spec.new do |s|
   s.requires_arc = true
 
   s.dependency "React"
-  s.dependency "QNSDK", "3.10.8"
+  s.dependency "QNSDK", "2.8.20"
 end
