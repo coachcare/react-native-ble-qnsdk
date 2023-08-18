@@ -1,4 +1,4 @@
-import { NativeModules, Platform } from 'react-native';
+import { NativeEventEmitter, NativeModules, Platform } from 'react-native';
 
 const LINKING_ERROR =
   `The package 'react-native-ble-qnsdk' doesn't seem to be linked. Make sure: \n\n` +
@@ -17,6 +17,33 @@ const BleQnsdk = NativeModules.BleQnsdk
       }
     );
 
-export function multiply(a: number, b: number): Promise<number> {
-  return BleQnsdk.multiply(a, b);
+const QnsSDKEmitter = new NativeEventEmitter(BleQnsdk);
+
+interface IYolandaUser {
+  birthday: string;
+  gender: 'male' | 'female';
+  id: string;
+  height: number;
+  unit: number;
+  athleteType: number;
 }
+
+function buildUser(user: IYolandaUser): Promise<number> {
+  return BleQnsdk.buildUser(user);
+}
+
+function onStartDiscovery(): Promise<void> {
+  return BleQnsdk.onStartDiscovery();
+}
+
+function onStopDiscovery(): void {
+  return BleQnsdk.onStopDiscovery();
+}
+
+export {
+  BleQnsdk,
+  QnsSDKEmitter,
+  buildUser,
+  onStartDiscovery,
+  onStopDiscovery,
+};
