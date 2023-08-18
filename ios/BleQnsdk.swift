@@ -6,10 +6,17 @@
 //
 
 import React // for RCTEventEmitter
-//import QNBluetooth
 import Foundation
 import CoreBluetooth
 
+@objc protocol UserObject: NSObjectProtocol {
+    var id: String { get }
+    var birthday: String { get }
+    var height: NSNumber { get }
+    var gender: String { get }
+    var athleteType: NSInteger { get }
+    var unit: NSInteger { get }
+}
 
 @objc(BleQnsdk)
 public class BleQnsdk: RCTEventEmitter  {
@@ -34,8 +41,9 @@ public class BleQnsdk: RCTEventEmitter  {
         bleApi.dataListener = self
     }
     
+
     @objc(user:resolver:rejecter:)
-    func buildUser(user: NSObject, resolver resolve: RCTPromiseResolveBlock,
+    func buildUser(user: UserObject, resolver resolve: RCTPromiseResolveBlock,
                    rejecter reject: RCTPromiseRejectBlock) {
         let dateStr = user.birthday
         let dateFormat = DateFormatter()
@@ -58,7 +66,7 @@ public class BleQnsdk: RCTEventEmitter  {
         self.user.athleteType = user.athleteType == 1 ? YLAthleteType.sport :YLAthleteType.default
         let config = bleApi.getConfig()
         
-        config?.unit = unit == 0 ? QNUnit.KG : QNUnit.LB
+        config?.unit = user.unit == 0 ? QNUnit.KG : QNUnit.LB
         resolve(true)
     }
     
