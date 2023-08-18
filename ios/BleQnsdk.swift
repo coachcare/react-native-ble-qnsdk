@@ -34,15 +34,15 @@ public class BleQnsdk: RCTEventEmitter  {
         bleApi.dataListener = self
     }
     
-    @objc(buildUser:birthday:height:gender:id:unit:athleteType:resolver:rejecter:)
-    func buildUser(name: String, birthday: String, height: Int, gender: String, id: String, unit: Int, athleteType: Int, resolver resolve: RCTPromiseResolveBlock,
+    @objc(user:resolver:rejecter:)
+    func buildUser(user: NSObject, resolver resolve: RCTPromiseResolveBlock,
                    rejecter reject: RCTPromiseRejectBlock) {
-        let dateStr = birthday
+        let dateStr = user.birthday
         let dateFormat = DateFormatter()
         dateFormat.dateFormat = "yyyy/MM/dd"
         let date = dateFormat.date(from: dateStr)
         
-        self.user = bleApi.buildUser(id, height: Int32(height), gender: gender, birthday: date, callback: { error in
+        self.user = bleApi.buildUser(user.id, height: Int32(user.height), gender: user.gender, birthday: date, callback: { error in
             if (error != nil) {
                 self.sendEvent(withName: "uploadProgress", body: [
                     "connectionStatus": [
@@ -55,7 +55,7 @@ public class BleQnsdk: RCTEventEmitter  {
             
         })
         
-        self.user.athleteType = athleteType == 1 ? YLAthleteType.sport :YLAthleteType.default
+        self.user.athleteType = user.athleteType == 1 ? YLAthleteType.sport :YLAthleteType.default
         let config = bleApi.getConfig()
         
         config?.unit = unit == 0 ? QNUnit.KG : QNUnit.LB
