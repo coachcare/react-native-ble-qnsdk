@@ -42,9 +42,8 @@ public class BleQnsdk: RCTEventEmitter  {
     }
     
 
-    @objc(user:resolver:rejecter:)
-    func buildUser(user: UserObject, resolver resolve: RCTPromiseResolveBlock,
-                   rejecter reject: RCTPromiseRejectBlock) {
+    @objc func buildUser(_ user: UserObject, resolver resolve: @escaping RCTPromiseResolveBlock,
+                         rejecter reject: @escaping RCTPromiseRejectBlock) {
         let dateStr = user.birthday
         let dateFormat = DateFormatter()
         dateFormat.dateFormat = "yyyy/MM/dd"
