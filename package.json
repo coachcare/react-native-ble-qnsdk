@@ -3,9 +3,11 @@
   "title": "React Native Ble Qnsdk",
   "version": "1.1.0",
   "description": "A React Native module for handling Bluetooth interactions with Yolanda scales",
-  "main": "index.js",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc"
   },
   "repository": {
     "type": "git",
@@ -34,6 +36,7 @@
   "readmeFilename": "README.md",
   "devDependencies": {
     "react": "18.2.0",
-    "react-native": "0.71.0"
+    "react-native": "0.71.0",
+    "typescript": "^5.1.6"
   }
 }
