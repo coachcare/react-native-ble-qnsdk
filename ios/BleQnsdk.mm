@@ -5,7 +5,7 @@
 #import <React/RCTEventEmitter.h>
 
 @interface RCT_EXTERN_MODULE(BleQnsdk, NSObject)
-RCT_EXTERN_METHOD(buildUser:(UserObject)user resolver: (RCTPromiseResolveBlock)resolve
+RCT_EXTERN_METHOD(buildUser:birthday:(NSString)birthday height:(NSInteger)height gender:(NSString)gender id:(NSString)id unit:(NSInteger)unit athleteType:(NSInteger)athleteType  resolver: (RCTPromiseResolveBlock)resolve
     rejecter: (RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(onStartDiscovery:(NSString *)name resolver:(RCTPromiseResolveBlock)resolve
     rejecter: (RCTPromiseRejectBlock)reject)

@@ -9,15 +9,6 @@ import React // for RCTEventEmitter
 import Foundation
 import CoreBluetooth
 
-@objc protocol UserObject: NSObjectProtocol {
-    var id: String { get }
-    var birthday: String { get }
-    var height: NSNumber { get }
-    var gender: String { get }
-    var athleteType: NSInteger { get }
-    var unit: NSInteger { get }
-}
-
 @objc(BleQnsdk)
 public class BleQnsdk: RCTEventEmitter  {
     var bleApi: QNBleApi!
@@ -42,14 +33,15 @@ public class BleQnsdk: RCTEventEmitter  {
     }
     
 
-    @objc func buildUser(_ user: UserObject, resolver resolve: @escaping RCTPromiseResolveBlock,
+    @objc func buildUser(_ birthday: String, height: Int, gender: String, id: String, unit: Int, athleteType: Int, resolver resolve: @escaping RCTPromiseResolveBlock,
                          rejecter reject: @escaping RCTPromiseRejectBlock) {
-        let dateStr = user.birthday
+        print("buildUserbuildUser")
+        let dateStr = birthday
         let dateFormat = DateFormatter()
         dateFormat.dateFormat = "yyyy/MM/dd"
         let date = dateFormat.date(from: dateStr)
         
-        self.user = bleApi.buildUser(user.id, height: Int32(user.height), gender: user.gender, birthday: date, callback: { error in
+        self.user = bleApi.buildUser(id, height: Int32(height), gender: gender, birthday: date, callback: { error in
             if (error != nil) {
                 self.sendEvent(withName: "uploadProgress", body: [
                     "connectionStatus": [
@@ -62,10 +54,10 @@ public class BleQnsdk: RCTEventEmitter  {
             
         })
         
-        self.user.athleteType = user.athleteType == 1 ? YLAthleteType.sport :YLAthleteType.default
+        self.user.athleteType = athleteType == 1 ? YLAthleteType.sport :YLAthleteType.default
         let config = bleApi.getConfig()
         
-        config?.unit = user.unit == 0 ? QNUnit.KG : QNUnit.LB
+        config?.unit = unit == 0 ? QNUnit.KG : QNUnit.LB
         resolve(true)
     }
     
