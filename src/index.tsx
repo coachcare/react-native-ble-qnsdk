@@ -29,7 +29,7 @@ interface IYolandaUser {
 }
 
 function buildUser(user: IYolandaUser): Promise<number> {
-  return BleQnsdk.buildUser(user);
+  return BleQnsdk.buildUser(user.birthday, user.height, user.gender, user.id, user.unit, user.athleteType);
 }
 
 function onStartDiscovery(): Promise<void> {

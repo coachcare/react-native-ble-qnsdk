@@ -16,7 +16,7 @@ const BleQnsdk = NativeModules.BleQnsdk
     );
 const QnsSDKEmitter = new NativeEventEmitter(BleQnsdk);
 function buildUser(user) {
-  return BleQnsdk.buildUser(user);
+  return BleQnsdk.buildUser(user.birthday, user.height, user.gender, user.id, user.unit, user.athleteType);
 }
 function onStartDiscovery() {
   return BleQnsdk.onStartDiscovery();
