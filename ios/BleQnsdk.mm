@@ -10,7 +10,7 @@ RCT_EXTERN_METHOD(buildUser:(NSString)birthday height:(NSInteger)height gender:(
 RCT_EXTERN_METHOD(onStartDiscovery:(RCTPromiseResolveBlock)resolve
     rejecter: (RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(onStopDiscovery:(RCTPromiseResolveBlock)resolve
-    rejecter: (RCTPromiseRejectBlock)reject)
+                  rejecter: (RCTPromiseRejectBlock)reject)
 
 + (BOOL)requiresMainQueueSetup
 {

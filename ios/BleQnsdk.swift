@@ -14,12 +14,10 @@ public class BleQnsdk: RCTEventEmitter  {
     var bleApi: QNBleApi!
     var user: QNUser!
     var device: QNBleDevice!
-    var scaleDataAry: [AnyHashable] = []
-    
+
     override public func supportedEvents() -> [String]! {
-        return ["uploadProgress"]
+        return ["uploadProgress", "scaleEventChange", "scaleStateChange", "connectionStatus", "measurementReceived" ]
     }
-    
     
     override init() {
         super.init()
@@ -31,7 +29,6 @@ public class BleQnsdk: RCTEventEmitter  {
         bleApi.connectionChangeListener = self
         bleApi.dataListener = self
     }
-    
 
     @objc func buildUser(_ birthday: String, height: Int, gender: String, id: String, unit: Int, athleteType: Int, resolver resolve: @escaping RCTPromiseResolveBlock,
                          rejecter reject: @escaping RCTPromiseRejectBlock) {
@@ -58,31 +55,6 @@ public class BleQnsdk: RCTEventEmitter  {
         config?.unit = unit == 0 ? QNUnit.KG : QNUnit.LB
         resolve(true)
     }
-    
-    // @objc
-    // func onStartDiscovery(_ resolve: RCTPromiseResolveBlock,
-    //                       rejecter reject: RCTPromiseRejectBlock) {
-    //     bleApi.startBleDeviceDiscovery({ error in
-    //         // This callback indicates whether the startup scan method is successful
-    //         if((error) != nil) {
-    //             do {
-    //                 if let error = error {
-    //                     print("Failed to start the scan method, reason: \(error)")
-    //                     self.sendEvent(withName: "uploadProgress", body: [
-    //                         "connectionStatus": [
-    //                             "status": "error",
-    //                             "error": error,
-    //                             "description": "Start Ble Discovery Error"
-    //                         ]
-    //                     ])
-                        
-    //                 }
-    //             }
-    //         }
-    //     })
-    //     resolve(true)
-        
-    // }
 
     @objc
     func onStartDiscovery(_ resolve: @escaping RCTPromiseResolveBlock,
@@ -100,7 +72,7 @@ public class BleQnsdk: RCTEventEmitter  {
     }
 
     @objc
-    func onStopDiscovery(_ resolve: @escaping RCTPromiseResolveBlock,
+    func onStopDiscovery(resolve: @escaping RCTPromiseResolveBlock,
                         rejecter reject: @escaping RCTPromiseRejectBlock) {
         bleApi.stopBleDeviceDiscorvery { error in
             if let error = error {
@@ -113,41 +85,74 @@ public class BleQnsdk: RCTEventEmitter  {
             resolve(true)
         }
     }
-
-    // @objc(onStopDiscovery)
-    // func onStopDiscovery() {
-    //     bleApi.stopBleDeviceDiscorvery({ error in
-    //         // This callback indicates whether the startup scan method is successful
-    //         if((error) != nil) {
-    //             do {
-    //                 if let error = error {
-    //                     print("Failed to stop the scan method, reason: \(error)")
-    //                 }
-    //             }
-    //         }
-    //     })
-    // }
     
+    func getDeviceInfo(device: QNBleDevice!) -> [String : Any] {
+        return [
+            "mac": device.mac,
+            "name": device.name,
+            "modeId": device.modeId,
+            "bluetoothName": device.bluetoothName,
+            "deviceType": device.deviceType,
+            "maxUserNum": device.maxUserNum,
+            "registeredUserNum": device.registeredUserNum,
+            "firmwareVer": device.firmwareVer,
+            "hardwareVer": device.hardwareVer,
+            "softwareVer": device.softwareVer
+        ]
+    }
+    
+    func getConnectedDeviceInfo() -> [String : Any] {
+        if (self.device == nil) {
+            return [:]
+        }
+
+        return getDeviceInfo(device: self.device)
+    }
+
     func onTryConnect() {
-        self.onStopDiscovery()
-        bleApi.connect(self.device, user: self.user, callback: { error in
-            // This callback indicates whether the startup scan method is successful
-            if((error) != nil) {
-                do {
-                    if let error = error {
-                        print("Failed to connect, reason: \(error)")
-                        self.sendEvent(withName: "uploadProgress", body: [
-                            "connectionStatus": [
-                                "status": "error",
-                                "error": error,
-                                "description": "Connection Error"
-                            ]
-                        ])
-                    }
-                }
+        connectToDevice()
+    }
+
+    func connectToDevice() {
+        onStopDiscovery(
+            resolve: { _ in
+                self.startConnection()
+            },
+            rejecter: { (_, _, _) in
+                self.startConnection()
             }
+        )
+    }
+
+    func startConnection() {
+        bleApi.connect(self.device, user: self.user, callback: { error in
+            if let error = error {
+                self.handleConnectionError(error)
+            }
+
+
         })
-        
+    }
+
+    func emitDeviceData(_ error: Error) {
+        self.sendEvent(withName: "uploadProgress", body: [
+            "connectionStatus": [
+                "status": "error",
+                "error": error,
+                "description": "Connection Error"
+            ]
+        ])
+    }
+
+    func handleConnectionError(_ error: Error) {
+        print("Failed to connect, reason: \(error)")
+        self.sendEvent(withName: "uploadProgress", body: [
+            "connectionStatus": [
+                "status": "error",
+                "error": error,
+                "description": "Connection Error"
+            ]
+        ])
     }
     
     func convertPoundsToGrams(_ weight: Double) -> Double {
@@ -174,7 +179,6 @@ extension BleQnsdk: QNBleDeviceDiscoveryListener {
         self.device = device
         self.onTryConnect()
     }
-    
 }
 
 extension BleQnsdk: QNBleConnectionChangeListener {
@@ -193,16 +197,13 @@ extension BleQnsdk: QNBleConnectionChangeListener {
                 "deviceId": device.modeId
             ]
         ])
-        
-        
-        
     }
     
     public func onConnected(_ device: QNBleDevice!) {
         self.sendEvent(withName: "uploadProgress", body: [
             "connectionStatus": [
                 "status": "onConnected",
-                "deviceId": device.modeId
+                "device": getDeviceInfo(device: device)
             ]
         ])
     }
@@ -238,19 +239,10 @@ extension BleQnsdk: QNBleConnectionChangeListener {
 
 extension BleQnsdk: QNScaleDataListener {
     public func onGetUnsteadyWeight(_ device: QNBleDevice!, weight: Double) {
-//        var finalWeight = weight * 1000
-//
         let finalWeight = convertPoundsToGrams(weight)
-//        // In order to have the same value for lb's in the app we must convert from lb's to grams
-//        if (bleApi.getConfig().unit == QNUnit.LB) {
-//            let pounds = bleApi.convertWeight(withTargetUnit: weight, unit: QNUnit.LB)
-//            let convertedWeight = 453.59237 * pounds
-//            finalWeight = convertedWeight
-//        }
         
         self.sendEvent(withName: "uploadProgress", body: [
             "measurement": [
-                "scaleId": device.modeId,
                 "weight": finalWeight
             ]
         ])
@@ -302,6 +294,7 @@ extension BleQnsdk: QNScaleDataListener {
     public func onGetStoredScale(_ device: QNBleDevice!, data storedDataList: [QNScaleStoreData]!) {
         print("onGetStoredScale")
         print(storedDataList)
+
     }
     
     public func onGetElectric(_ electric: UInt, device: QNBleDevice!) {
