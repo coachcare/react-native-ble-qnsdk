@@ -28,22 +28,29 @@ interface IYolandaUser {
   athleteType: number;
 }
 
-function buildUser(user: IYolandaUser): Promise<number> {
-  return BleQnsdk.buildUser(user.birthday, user.height, user.gender, user.id, user.unit, user.athleteType);
+function buildYolandaUser(user: IYolandaUser): Promise<number> {
+  return BleQnsdk.buildUser(
+    user.birthday,
+    user.height,
+    user.gender,
+    user.id,
+    user.unit,
+    user.athleteType
+  );
 }
 
-function onStartDiscovery(): Promise<void> {
+function startYolandaScan(): Promise<void> {
   return BleQnsdk.onStartDiscovery();
 }
 
-function onStopDiscovery(): void {
+function stopYolandaScan(): Promise<void> {
   return BleQnsdk.onStopDiscovery();
 }
 
 export {
   BleQnsdk,
   QnsSDKEmitter,
-  buildUser,
-  onStartDiscovery,
-  onStopDiscovery,
+  buildYolandaUser,
+  startYolandaScan,
+  stopYolandaScan,
 };

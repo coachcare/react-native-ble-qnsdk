@@ -35,11 +35,9 @@ public class BleQnsdk: RCTEventEmitter  {
 
     @objc func buildUser(_ birthday: String, height: Int, gender: String, id: String, unit: Int, athleteType: Int, resolver resolve: @escaping RCTPromiseResolveBlock,
                          rejecter reject: @escaping RCTPromiseRejectBlock) {
-        print("buildUserbuildUser")
-        let dateStr = birthday
-        let dateFormat = DateFormatter()
-        dateFormat.dateFormat = "yyyy/MM/dd"
-        let date = dateFormat.date(from: dateStr)
+        let birthdayDateFormatter = DateFormatter()
+        birthdayDateFormatter.dateFormat = "yyyy/MM/dd"
+        let date = birthdayDateFormatter.date(from: birthday)
         
         self.user = bleApi.buildUser(id, height: Int32(height), gender: gender, birthday: date, callback: { error in
             if (error != nil) {
@@ -61,44 +59,74 @@ public class BleQnsdk: RCTEventEmitter  {
         resolve(true)
     }
     
-    @objc
-    func onStartDiscovery(_ resolve: RCTPromiseResolveBlock,
-                          rejecter reject: RCTPromiseRejectBlock) {
-        bleApi.startBleDeviceDiscovery({ error in
-            // This callback indicates whether the startup scan method is successful
-            if((error) != nil) {
-                do {
-                    if let error = error {
-                        print("Failed to start the scan method, reason: \(error)")
-                        self.sendEvent(withName: "uploadProgress", body: [
-                            "connectionStatus": [
-                                "status": "error",
-                                "error": error,
-                                "description": "Start Ble Discovery Error"
-                            ]
-                        ])
+    // @objc
+    // func onStartDiscovery(_ resolve: RCTPromiseResolveBlock,
+    //                       rejecter reject: RCTPromiseRejectBlock) {
+    //     bleApi.startBleDeviceDiscovery({ error in
+    //         // This callback indicates whether the startup scan method is successful
+    //         if((error) != nil) {
+    //             do {
+    //                 if let error = error {
+    //                     print("Failed to start the scan method, reason: \(error)")
+    //                     self.sendEvent(withName: "uploadProgress", body: [
+    //                         "connectionStatus": [
+    //                             "status": "error",
+    //                             "error": error,
+    //                             "description": "Start Ble Discovery Error"
+    //                         ]
+    //                     ])
                         
-                    }
-                }
-            }
-        })
-        resolve(true)
+    //                 }
+    //             }
+    //         }
+    //     })
+    //     resolve(true)
         
-    }
-    
-    @objc(onStopDiscovery)
-    func onStopDiscovery() {
-        bleApi.stopBleDeviceDiscorvery({ error in
-            // This callback indicates whether the startup scan method is successful
-            if((error) != nil) {
-                do {
-                    if let error = error {
-                        print("Failed to stop the scan method, reason: \(error)")
-                    }
-                }
+    // }
+
+    @objc
+    func onStartDiscovery(_ resolve: @escaping RCTPromiseResolveBlock,
+                        rejecter reject: @escaping RCTPromiseRejectBlock) {
+        bleApi.startBleDeviceDiscovery { error in
+            if let error = error {
+                let errorMessage = "Failed to start the scan method, reason: \(error)"
+                let errorCode = "BLE_DISCOVERY_ERROR"
+                reject(errorCode, errorMessage, error)
+                return
             }
-        })
+            
+            resolve(true)
+        }
     }
+
+    @objc
+    func onStopDiscovery(_ resolve: @escaping RCTPromiseResolveBlock,
+                        rejecter reject: @escaping RCTPromiseRejectBlock) {
+        bleApi.stopBleDeviceDiscorvery { error in
+            if let error = error {
+                let errorMessage = "Failed to stop the scan method, reason: \(error)"
+                let errorCode = "BLE_STOP_DISCOVERY_ERROR"
+                reject(errorCode, errorMessage, error)
+                return
+            }
+            
+            resolve(true)
+        }
+    }
+
+    // @objc(onStopDiscovery)
+    // func onStopDiscovery() {
+    //     bleApi.stopBleDeviceDiscorvery({ error in
+    //         // This callback indicates whether the startup scan method is successful
+    //         if((error) != nil) {
+    //             do {
+    //                 if let error = error {
+    //                     print("Failed to stop the scan method, reason: \(error)")
+    //                 }
+    //             }
+    //         }
+    //     })
+    // }
     
     func onTryConnect() {
         self.onStopDiscovery()
@@ -122,6 +150,18 @@ public class BleQnsdk: RCTEventEmitter  {
         
     }
     
+    func convertPoundsToGrams(_ weight: Double) -> Double {
+        var finalWeight = weight * 1000
+        
+        // In order to have the same value for lb's in the app, convert from lb's to grams
+        if bleApi.getConfig().unit == QNUnit.LB {
+            let pounds = bleApi.convertWeight(withTargetUnit: weight, unit: QNUnit.LB)
+            let convertedWeight = 453.59237 * pounds
+            finalWeight = convertedWeight
+        }
+        
+        return finalWeight
+    }
     
 }
 
@@ -198,14 +238,15 @@ extension BleQnsdk: QNBleConnectionChangeListener {
 
 extension BleQnsdk: QNScaleDataListener {
     public func onGetUnsteadyWeight(_ device: QNBleDevice!, weight: Double) {
-        var finalWeight = weight * 1000
-        
-        // In order to have the same value for lb's in the app we must convert from lb's to grams
-        if (bleApi.getConfig().unit == QNUnit.LB) {
-            let pounds = bleApi.convertWeight(withTargetUnit: weight, unit: QNUnit.LB)
-            let convertedWeight = 453.59237 * pounds
-            finalWeight = convertedWeight
-        }
+//        var finalWeight = weight * 1000
+//
+        let finalWeight = convertPoundsToGrams(weight)
+//        // In order to have the same value for lb's in the app we must convert from lb's to grams
+//        if (bleApi.getConfig().unit == QNUnit.LB) {
+//            let pounds = bleApi.convertWeight(withTargetUnit: weight, unit: QNUnit.LB)
+//            let convertedWeight = 453.59237 * pounds
+//            finalWeight = convertedWeight
+//        }
         
         self.sendEvent(withName: "uploadProgress", body: [
             "measurement": [
@@ -226,16 +267,7 @@ extension BleQnsdk: QNScaleDataListener {
                 response["visceralFatTanita"] = item.value
             }
             if (item.name == "weight") {
-                var finalWeight = item.value * 1000
-                
-                // In order to have the same value for lb's in the app we must convert from lb's to grams
-                if (bleApi.getConfig().unit == QNUnit.LB) {
-                    let pounds = bleApi.convertWeight(withTargetUnit: item.value, unit: QNUnit.LB)
-                    let convertedWeight = 453.59237 * pounds
-                    finalWeight = convertedWeight
-                }
-                
-                response["weight"] = finalWeight
+                response["weight"] = convertPoundsToGrams(item.value)
             }
             if (item.name == "lean body weight") {
                 response["fatFreeMass"] = (item.value * 1000)
@@ -268,9 +300,12 @@ extension BleQnsdk: QNScaleDataListener {
     }
     
     public func onGetStoredScale(_ device: QNBleDevice!, data storedDataList: [QNScaleStoreData]!) {
+        print("onGetStoredScale")
+        print(storedDataList)
     }
     
     public func onGetElectric(_ electric: UInt, device: QNBleDevice!) {
+        print("onGetElectric", electric)
     }
     
     public func onScaleStateChange(_ device: QNBleDevice!, scaleState state: QNScaleState) {
