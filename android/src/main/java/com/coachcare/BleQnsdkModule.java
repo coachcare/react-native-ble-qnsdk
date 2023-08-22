@@ -178,7 +178,7 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
 
     @Override
     public String getName() {
-        return "QNSDKManager";
+        return "BleQnsdk";
     }
 
     @ReactMethod
