@@ -1,4 +1,4 @@
-package com.coachcare.qnsdk;
+package com.coachcare;
 
 import java.util.Date;
 

@@ -182,7 +182,7 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
     }
 
     @ReactMethod
-    public void buildUser(String name, String birthday, int height, String gender, String id, int unit, int athleteType,
+    public void buildUser(String birthday, int height, String gender, String id, int unit, int athleteType,
             Promise promise) {
         try {
             SimpleDateFormat sdf = new SimpleDateFormat(FORMAT_SHORT); // here set the pattern as you date in string was
@@ -471,13 +471,13 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
     }
 
     @ReactMethod
-    public void onStartDiscovery(String name, final Promise promise) {
+    public void onStartDiscovery(final Promise promise) {
         Handler mHandler = new Handler();
         mHandler.post(new Runnable() {
 
             @Override
             public void run() {
-                Log.d("Yolanda onStartDscovery", String.valueOf(name));
+
                 mQNBleApi.startBleDeviceDiscovery(new QNResultCallback() {
                     @Override
                     public void onResult(int code, String msg) {
