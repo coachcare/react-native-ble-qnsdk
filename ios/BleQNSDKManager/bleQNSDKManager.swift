@@ -243,7 +243,7 @@ extension BleQnsdk: QNScaleDataListener {
         let finalWeight = convertPoundsToGrams(weight)
         
         self.sendEvent(withName: EventEmitterState.uploadProgress.rawValue, body: [
-            EventEmitterState.measurementReceived.rawValue: [
+            EventEmitterState.temporaryMeasurementReceived.rawValue: [
                 "weight": finalWeight
             ]
         ])
@@ -287,7 +287,7 @@ extension BleQnsdk: QNScaleDataListener {
         let data = self.filterResponse(scaleData.getAllItem())
         
         self.sendEvent(withName: EventEmitterState.uploadProgress.rawValue, body: [
-            EventEmitterState.measurementReceived.rawValue:
+            EventEmitterState.finalMeasurementReceived.rawValue:
                 data
         ])
     }

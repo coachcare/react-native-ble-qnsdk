@@ -12,7 +12,8 @@ enum EventEmitterState: String {
     case scaleStateChange = "scaleStateChange"
     case connectionStatus = "connectionStatus"
     case deviceInfo = "deviceInfo"
-    case measurementReceived = "measurementReceived"
+    case temporaryMeasurementReceived = "temporaryMeasurementReceived"
+    case finalMeasurementReceived = "finalMeasurementReceived"
     case uploadProgress = "uploadProgress"
 }
 
@@ -20,7 +21,6 @@ enum ConnectionStatusFields: String {
     case status = "status"
     case error = "error"
     case description = "description"
-    case measurementReceived = "measurementReceived"
     case uploadProgress = "uploadProgress"
 }
 

@@ -367,7 +367,7 @@
                     WritableMap measurement = Arguments.createMap();
                     WritableMap params = Arguments.createMap();
                     measurement.putDouble("weight", finalWeight);
-                    params.putMap("measurementReceived", measurement);
+                    params.putMap("temporaryMeasurementReceived", measurement);
                     sendEventToJS("uploadProgress", params);
                 }
 
@@ -427,7 +427,7 @@
                     }
 
                     WritableMap measurement = Arguments.createMap();
-                    measurement.putMap("measurementReceived", params);
+                    measurement.putMap("finalMeasurementReceived", params);
 
                     sendEventToJS("uploadProgress", measurement);
                 }
