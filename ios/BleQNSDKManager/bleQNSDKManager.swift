@@ -40,9 +40,9 @@ public class BleQnsdk: RCTEventEmitter  {
             if (error != nil) {
                 self.sendEvent(withName: EventEmitterState.uploadProgress.rawValue, body: [
                     EventEmitterState.connectionStatus.rawValue: [
-                        "status": "error",
+                        "status": ConnectionStatusState.error.rawValue,
                         "error": error,
-                        "description": "Build user error"
+                        "description": ConnectionStatusDescription.buildUserErrorDescription.rawValue
                     ]
                 ])
             }
@@ -134,23 +134,14 @@ public class BleQnsdk: RCTEventEmitter  {
         })
     }
 
-    func emitDeviceData(_ error: Error) {
-        self.sendEvent(withName: EventEmitterState.uploadProgress.rawValue, body: [
-            EventEmitterState.connectionStatus.rawValue: [
-                "status": "error",
-                "error": error,
-                "description": "Connection Error"
-            ]
-        ])
-    }
 
     func handleConnectionError(_ error: Error) {
         print("Failed to connect, reason: \(error)")
         self.sendEvent(withName: EventEmitterState.uploadProgress.rawValue, body: [
             EventEmitterState.connectionStatus.rawValue: [
-                "status": "error",
+                "status": ConnectionStatusState.error.rawValue,
                 "error": error,
-                "description": "Connection Error"
+                "description": ConnectionStatusDescription.connectionErrorDescription.rawValue
             ]
         ])
     }
@@ -185,7 +176,7 @@ extension BleQnsdk: QNBleConnectionChangeListener {
     public func onDisconnected(_ device: QNBleDevice!) {
         self.sendEvent(withName: EventEmitterState.uploadProgress.rawValue, body: [
             EventEmitterState.connectionStatus.rawValue: [
-                "status": "onDisconnected"
+                "status": ConnectionStatusState.onDisconnected.rawValue
             ]
         ])
         
@@ -193,8 +184,7 @@ extension BleQnsdk: QNBleConnectionChangeListener {
     public func onConnecting(_ device: QNBleDevice!) {
         self.sendEvent(withName: EventEmitterState.uploadProgress.rawValue, body: [
             EventEmitterState.connectionStatus.rawValue: [
-                "status": "onConnecting",
-                "deviceId": device.modeId
+                "status": ConnectionStatusState.onConnecting.rawValue
             ]
         ])
     }
@@ -202,7 +192,7 @@ extension BleQnsdk: QNBleConnectionChangeListener {
     public func onConnected(_ device: QNBleDevice!) {
         self.sendEvent(withName: EventEmitterState.uploadProgress.rawValue, body: [
             EventEmitterState.connectionStatus.rawValue: [
-                "status": "onConnected",
+                "status": ConnectionStatusState.onConnected.rawValue,
                 "device": getDeviceInfo(device: device)
             ]
         ])
@@ -212,16 +202,15 @@ extension BleQnsdk: QNBleConnectionChangeListener {
         print("onServiceSearchComplete")
         self.sendEvent(withName: EventEmitterState.uploadProgress.rawValue, body: [
             EventEmitterState.connectionStatus.rawValue: [
-                "status": "onServiceSearchComplete"
+                "status": ConnectionStatusState.onServiceSearchComplete.rawValue
             ]
         ])
     }
     
     public func onDisconnecting(_ device: QNBleDevice!) {
-        print("onDisconnecting")
         self.sendEvent(withName: EventEmitterState.uploadProgress.rawValue, body: [
             EventEmitterState.connectionStatus.rawValue: [
-                "status": "onDisconnecting"
+                "status": ConnectionStatusState.onDisconnecting.rawValue
             ]
         ])
     }
@@ -229,7 +218,7 @@ extension BleQnsdk: QNBleConnectionChangeListener {
     public func onConnectError(_ device: QNBleDevice!, error: Error!) {
         self.sendEvent(withName: EventEmitterState.uploadProgress.rawValue, body: [
             EventEmitterState.connectionStatus.rawValue: [
-                "status": "error",
+                "status": ConnectionStatusState.error.rawValue,
                 "error": error
             ]
         ])
@@ -242,7 +231,7 @@ extension BleQnsdk: QNScaleDataListener {
         let finalWeight = convertPoundsToGrams(weight)
         
         self.sendEvent(withName: EventEmitterState.uploadProgress.rawValue, body: [
-            "measurement": [
+            EventEmitterState.measurementReceived.rawValue: [
                 "weight": finalWeight
             ]
         ])
@@ -286,7 +275,7 @@ extension BleQnsdk: QNScaleDataListener {
         let data = self.filterResponse(scaleData.getAllItem())
         
         self.sendEvent(withName: EventEmitterState.uploadProgress.rawValue, body: [
-            "measurement":
+            EventEmitterState.measurementReceived.rawValue:
                 data
         ])
     }

@@ -1,10 +1,17 @@
-import { NativeEventEmitter, NativeModules, Platform } from 'react-native';
+import {
+  ConnectionStatus,
+  IYolandaUser,
+  MeasurementResponse,
+  ScaleEventValue,
+  YolandaEventEmitter,
+} from "./types";
+import { NativeEventEmitter, NativeModules, Platform } from "react-native";
 
 const LINKING_ERROR =
   `The package 'react-native-ble-qnsdk' doesn't seem to be linked. Make sure: \n\n` +
-  Platform.select({ ios: "- You have run 'pod install'\n", default: '' }) +
-  '- You rebuilt the app after installing the package\n' +
-  '- You are not using Expo Go\n';
+  Platform.select({ ios: "- You have run 'pod install'\n", default: "" }) +
+  "- You rebuilt the app after installing the package\n" +
+  "- You are not using Expo Go\n";
 
 const BleQnsdk = NativeModules.BleQnsdk
   ? NativeModules.BleQnsdk
@@ -17,16 +24,7 @@ const BleQnsdk = NativeModules.BleQnsdk
       }
     );
 
-const QnsSDKEmitter = new NativeEventEmitter(BleQnsdk);
-
-interface IYolandaUser {
-  birthday: string;
-  gender: 'male' | 'female';
-  id: string;
-  height: number;
-  unit: number;
-  athleteType: number;
-}
+const QNSDKEmitter = new NativeEventEmitter(BleQnsdk);
 
 function buildYolandaUser(user: IYolandaUser): Promise<number> {
   return BleQnsdk.buildUser(
@@ -49,8 +47,13 @@ function stopYolandaScan(): Promise<void> {
 
 export {
   BleQnsdk,
-  QnsSDKEmitter,
+  QNSDKEmitter,
   buildYolandaUser,
   startYolandaScan,
   stopYolandaScan,
+  IYolandaUser,
+  ConnectionStatus,
+  MeasurementResponse,
+  ScaleEventValue,
+  YolandaEventEmitter,
 };

@@ -14,3 +14,26 @@ enum EventEmitterState: String {
     case measurementReceived = "measurementReceived"
     case uploadProgress = "uploadProgress"
 }
+
+enum ConnectionStatusFields: String {
+    case status = "status"
+    case error = "error"
+    case description = "description"
+    case measurementReceived = "measurementReceived"
+    case uploadProgress = "uploadProgress"
+}
+
+enum ConnectionStatusState: String {
+    case error = "error"
+    case onDisconnected = "onDisconnected"
+    case onConnecting = "onConnecting"
+    case onConnected = "onConnected"
+    case onServiceSearchComplete = "onServiceSearchComplete"
+    case onDisconnecting = "onDisconnecting"
+}
+
+enum ConnectionStatusDescription: String {
+    case connectionErrorDescription = "Connection Error"
+    case buildUserErrorDescription = "Build user error"
+
+}
