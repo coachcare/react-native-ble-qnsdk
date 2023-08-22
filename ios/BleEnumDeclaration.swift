@@ -11,6 +11,7 @@ enum EventEmitterState: String {
     case scaleEventChange = "scaleEventChange"
     case scaleStateChange = "scaleStateChange"
     case connectionStatus = "connectionStatus"
+    case deviceInfo = "deviceInfo"
     case measurementReceived = "measurementReceived"
     case uploadProgress = "uploadProgress"
 }

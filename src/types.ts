@@ -1,11 +1,11 @@
 export interface IYolandaUser {
-    birthday: string;
-    gender: 'male' | 'female';
-    id: string;
-    height: number;
-    unit: number;
-    athleteType: number;
-  }
+  birthday: string;
+  gender: "male" | "female";
+  id: string;
+  height: number;
+  unit: number;
+  athleteType: number;
+}
 
 export interface ConnectionStatus {
   status: string;
@@ -28,9 +28,23 @@ export interface ScaleEventValue {
   value: number;
 }
 
+export interface DeviceInfo {
+  mac: string;
+  name: string;
+  modeId: string;
+  bluetoothName: string;
+  deviceType: string;
+  maxUserNum: number;
+  registeredUserNum: number;
+  firmwareVer: number;
+  hardwareVer: number;
+  softwareVer: number;
+}
+
 export interface YolandaEventEmitter {
   connectionStatus?: ConnectionStatus;
   measurementReceived?: MeasurementResponse;
   scaleEventChange?: ScaleEventValue;
   scaleStateChange?: ScaleEventValue;
+  deviceInfo?: DeviceInfo;
 }

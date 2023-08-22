@@ -45,12 +45,17 @@ function stopYolandaScan(): Promise<void> {
   return BleQnsdk.onStopDiscovery();
 }
 
+function fetchConnectedDeviceInfo(): void {
+  return BleQnsdk.fetchConnectedDeviceInfo();
+}
+
 export {
   BleQnsdk,
   QNSDKEmitter,
   buildYolandaUser,
   startYolandaScan,
   stopYolandaScan,
+  fetchConnectedDeviceInfo,
   IYolandaUser,
   ConnectionStatus,
   MeasurementResponse,

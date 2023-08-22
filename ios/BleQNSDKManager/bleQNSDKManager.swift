@@ -85,6 +85,11 @@ public class BleQnsdk: RCTEventEmitter  {
             resolve(true)
         }
     }
+
+    @objc
+    func fetchConnectedDeviceInfo() {
+        sendConnectedDeviceInfo()
+    }
     
     func getDeviceInfo(device: QNBleDevice!) -> [String : Any] {
         return [
@@ -129,9 +134,13 @@ public class BleQnsdk: RCTEventEmitter  {
             if let error = error {
                 self.handleConnectionError(error)
             }
-
-
         })
+    }
+    
+    func sendConnectedDeviceInfo() {
+        self.sendEvent(withName: EventEmitterState.uploadProgress.rawValue, body: [
+            EventEmitterState.deviceInfo.rawValue: getConnectedDeviceInfo()
+        ])
     }
 
 
@@ -190,12 +199,15 @@ extension BleQnsdk: QNBleConnectionChangeListener {
     }
     
     public func onConnected(_ device: QNBleDevice!) {
+        self.device = device
         self.sendEvent(withName: EventEmitterState.uploadProgress.rawValue, body: [
             EventEmitterState.connectionStatus.rawValue: [
                 "status": ConnectionStatusState.onConnected.rawValue,
                 "device": getDeviceInfo(device: device)
             ]
         ])
+        
+        self.sendConnectedDeviceInfo()
     }
     
     public func onServiceSearchComplete(_ device: QNBleDevice!) {
@@ -292,7 +304,9 @@ extension BleQnsdk: QNScaleDataListener {
     
     public func onScaleStateChange(_ device: QNBleDevice!, scaleState state: QNScaleState) {
         self.sendEvent(withName: EventEmitterState.uploadProgress.rawValue, body: [
-            "scaleStateChange": state.rawValue
+            EventEmitterState.scaleStateChange.rawValue: [
+                "value": state.rawValue
+            ]
         ])
         
     }

@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.stopYolandaScan = exports.startYolandaScan = exports.buildYolandaUser = exports.QNSDKEmitter = exports.BleQnsdk = void 0;
+exports.fetchConnectedDeviceInfo = exports.stopYolandaScan = exports.startYolandaScan = exports.buildYolandaUser = exports.QNSDKEmitter = exports.BleQnsdk = void 0;
 const react_native_1 = require("react-native");
 const LINKING_ERROR = `The package 'react-native-ble-qnsdk' doesn't seem to be linked. Make sure: \n\n` +
     react_native_1.Platform.select({ ios: "- You have run 'pod install'\n", default: "" }) +
@@ -28,3 +28,7 @@ function stopYolandaScan() {
     return BleQnsdk.onStopDiscovery();
 }
 exports.stopYolandaScan = stopYolandaScan;
+function fetchConnectedDeviceInfo() {
+    return BleQnsdk.fetchConnectedDeviceInfo();
+}
+exports.fetchConnectedDeviceInfo = fetchConnectedDeviceInfo;
