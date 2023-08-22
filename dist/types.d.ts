@@ -1,6 +1,6 @@
 export interface IYolandaUser {
     birthday: string;
-    gender: "male" | "female";
+    gender: string | "male" | "female";
     id: string;
     height: number;
     unit: number;
@@ -11,15 +11,17 @@ export interface ConnectionStatus {
     error?: string;
     description?: string;
 }
-export interface MeasurementResponse {
+export interface TemporaryMeasurementResponse {
     weight: number;
-    basalMetabolicRate?: number;
-    visceralFatTanita?: number;
-    fatFreeMass?: number;
-    bodyFat?: number;
-    waterPercentage?: number;
-    skeletalMuscleRatio?: number;
-    muscleMass?: number;
+}
+export interface FinalMeasurementResponse extends TemporaryMeasurementResponse {
+    basalMetabolicRate: number;
+    visceralFatTanita: number;
+    fatFreeMass: number;
+    bodyFat: number;
+    waterPercentage: number;
+    skeletalMuscleRatio: number;
+    muscleMass: number;
 }
 export interface ScaleEventValue {
     value: number;
@@ -38,7 +40,8 @@ export interface DeviceInfo {
 }
 export interface YolandaEventEmitter {
     connectionStatus?: ConnectionStatus;
-    measurementReceived?: MeasurementResponse;
+    temporaryMeasurementReceived?: TemporaryMeasurementResponse;
+    finalMeasurementReceived?: FinalMeasurementResponse;
     scaleEventChange?: ScaleEventValue;
     scaleStateChange?: ScaleEventValue;
     deviceInfo?: DeviceInfo;
