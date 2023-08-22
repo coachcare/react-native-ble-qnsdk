@@ -447,7 +447,7 @@
                     WritableMap params = Arguments.createMap();
                     // Create the nested "value" WritableMap
                     WritableMap valueMap = Arguments.createMap();
-                    valueMap.putString("value", String.valueOf(status));
+                    valueMap.putInt("value", status);
 
                     params.putMap("scaleStateChange", valueMap);
                     sendEventToJS("uploadProgress", params);
@@ -458,7 +458,7 @@
                     WritableMap params = Arguments.createMap();
                     // Create the nested "value" WritableMap
                     WritableMap valueMap = Arguments.createMap();
-                    valueMap.putString("value", String.valueOf(i));
+                    valueMap.putInt("value", i);
 
                     params.putMap("onScaleEventChange", valueMap);
                     sendEventToJS("uploadProgress", params);
