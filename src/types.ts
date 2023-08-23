@@ -26,8 +26,8 @@ export interface FinalMeasurementResponse extends TemporaryMeasurementResponse {
   muscleMass: number;
 }
 
-export interface DeviceInfo {
-  mac: string;
+export interface YolandaDeviceInfo {
+  id: string;
   name: string;
   modeId: string;
   bluetoothName: string;
@@ -66,7 +66,7 @@ export interface ScaleStateChangeEvent {
 
 export interface DeviceInfoEvent {
   type: "deviceInfo";
-  value: DeviceInfo;
+  value: YolandaDeviceInfo;
 }
 
 export type YolandaEventEmitter =

@@ -214,7 +214,7 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
 
     public WritableMap getDeviceInfo(QNBleDevice device) {
         WritableMap infoMap = Arguments.createMap();
-        infoMap.putString("mac", device.getMac());
+        infoMap.putString("id", device.getMac());
         infoMap.putString("name", device.getName());
         infoMap.putString("modeId", device.getModeId());
         infoMap.putString("bluetoothName", device.getBluetoothName());
@@ -260,7 +260,7 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
         params.putString("type", "connectionStatus");
         params.putMap("value", valueMap);
 
-        sendEventToJS("uploadProgress", item);
+        sendEventToJS("uploadProgress", params);
     }
 
     private void setBleStatusWithError(Exception error, String description) {
