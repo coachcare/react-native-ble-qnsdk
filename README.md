@@ -167,7 +167,7 @@ The SDK will handle all of the interactions. Just listen for the final measureme
 -- iOS - Be sure to add key to "Copy Bundle Resources" to have access to the key in the npm module. In Xcode Scroll down to the "Build Phases" tab and locate the "Copy Bundle Resources" phase. Add files by dragging them into the "Copy Bundle Resources" list or using the "+" button, and ensure the desired resources are included in your app bundle.
 - Be sure to request proper bluetooth permissions before using this SDK. Permissions are handled outside of this logic
 
-License
+## License
 This project is licensed under the MIT License
 
    

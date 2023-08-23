@@ -9,7 +9,6 @@ import com.facebook.react.bridge.LifecycleEventListener;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
-import com.facebook.react.bridge.Callback;
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
@@ -35,9 +34,7 @@ import com.qn.device.out.QNUser;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import com.qn.device.listener.QNBleConnectionChangeListener;
 
@@ -64,15 +61,11 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
 
         // Move initialization to the background thread
         backgroundHandler.post(() -> {
-            // mQNBleApi = QNBleApi.getInstance(reactContext);
-            // initSDK();
             this.initializeListeners();
         });
     }
 
     public void initializeListeners() {
-        Log.d("Yolanda Scale", "initializeListeners \n");
-
         mQNBleApi = QNBleApi.getInstance(reactContext);
         initSDK();
         this.setConfig();
@@ -106,12 +99,10 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
                 Log.d("Yolanda Scale", "Initialization code\n" + code);
             }
         });
-
     }
 
     @Override
     public void onHostResume() {
-        // this.initializeListeners();
         Log.w("Yolanda Scale", "on onHostResume");
     }
 
@@ -203,12 +194,10 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
 
             QNConfig mQnConfig = mQNBleApi.getConfig();
             mQnConfig.setUnit(unit);
-            Log.d("Yolanda Scale", "buildUser file\n");
-            promise.resolve("build user success");
+            promise.resolve("Yolanda build user success");
         } catch (IllegalViewOperationException | ParseException e) {
-            Log.d("Yolanda CATCH ERROR", String.valueOf(e));
             setBleStatusWithError(e, "Build user error");
-            promise.reject("build user reject", e);
+            promise.reject("Yolanda build user reject", e);
         }
     }
 
@@ -441,12 +430,9 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
             @Override
             public void onScaleStateChange(QNBleDevice device, int status) {
                 WritableMap params = Arguments.createMap();
-                WritableMap valueMap = Arguments.createMap();
-
-                valueMap.putInt("value", status);
 
                 params.putString("type", "scaleStateChange");
-                params.putMap("value", valueMap);
+                params.putInt("value", status);
                 sendEventToJS("uploadProgress", params);
             }
 
@@ -454,11 +440,8 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
             public void onScaleEventChange(QNBleDevice qnBleDevice, int i) {
                 WritableMap params = Arguments.createMap();
 
-                WritableMap valueMap = Arguments.createMap();
-                valueMap.putInt("value", i);
-
                 params.putString("type", "onScaleEventChange");
-                params.putMap("value", valueMap);
+                params.putInt("value", i);
 
                 sendEventToJS("uploadProgress", params);
             }
@@ -466,7 +449,6 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
             @Override
             public void readSnComplete(QNBleDevice qnBleDevice, String s) {
                 Log.d("Yolanda readSnComplete", String.valueOf(qnBleDevice));
-
             }
 
         });
@@ -487,20 +469,14 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
             @Override
             public void onStopScan() {
                 mQNBleApi.stopBleDeviceDiscovery(new QNResultCallback() {
-
                     @Override
                     public void onResult(int code, String msg) {
-                        Log.d("Yolanda onStopScan c", String.valueOf(code));
-                        Log.d("Yolanda onStopScan m", String.valueOf(msg));
-                        if (code == CheckStatus.OK.getCode()) {
-                        }
                     }
                 });
             }
 
             @Override
             public void onScanFail(int code) {
-                Log.d("Yolanda onScanFail", String.valueOf(code));
                 setBleStatusWithError(code, "onScanFail");
             }
 
@@ -528,14 +504,11 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
                 mQNBleApi.startBleDeviceDiscovery(new QNResultCallback() {
                     @Override
                     public void onResult(int code, String msg) {
-                        Log.d("Yolanda onResult code ", String.valueOf(code));
-                        Log.d("Yolanda onResult mesg", String.valueOf(msg));
                         if (code == CheckStatus.OK.getCode()) {
-                            promise.resolve(true);
-                        }
-                        if (code != CheckStatus.OK.getCode()) {
+                            promise.resolve(code);
+                        } else {
                             setBleStatusWithError(code, "startBleDeviceDiscovery");
-                            promise.reject(String.valueOf(code));
+                            promise.reject("startBleDeviceDiscovery", String.valueOf(code));
                         }
                     }
                 });
@@ -550,6 +523,8 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
             public void onResult(int code, String msg) {
                 if (code == CheckStatus.OK.getCode()) {
                     promise.resolve(code);
+                } else {
+                    promise.reject("onStopDiscovery", String.valueOf(code));
                 }
             }
         });
