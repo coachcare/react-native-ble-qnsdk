@@ -23,9 +23,6 @@ export interface FinalMeasurementResponse extends TemporaryMeasurementResponse {
     skeletalMuscleRatio: number;
     muscleMass: number;
 }
-export interface ScaleEventValue {
-    value: number;
-}
 export interface DeviceInfo {
     mac: string;
     name: string;
@@ -52,14 +49,14 @@ export interface FinalMeasurementEvent {
 }
 export interface ScaleEventChangeEvent {
     type: "scaleEventChange";
-    value: ScaleEventValue;
+    value: number;
 }
 export interface ScaleStateChangeEvent {
     type: "scaleStateChange";
-    value: ScaleEventValue;
+    value: number;
 }
 export interface DeviceInfoEvent {
     type: "deviceInfo";
     value: DeviceInfo;
 }
-export type YolandaEventEmitter = TemporaryMeasurementEvent | FinalMeasurementEvent | ScaleEventChangeEvent | ScaleStateChangeEvent | DeviceInfoEvent;
+export type YolandaEventEmitter = TemporaryMeasurementEvent | FinalMeasurementEvent | ScaleEventChangeEvent | ScaleStateChangeEvent | DeviceInfoEvent | ConnectionStatusEmitter;

@@ -326,6 +326,7 @@ extension BleQnsdk: QNBleConnectionChangeListener {
                     "status": ConnectionStatusState.error.rawValue,
                     "error": error
                 ]
+                ]
         )
     }
     
