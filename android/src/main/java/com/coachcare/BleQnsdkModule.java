@@ -1,7 +1,7 @@
 package com.coachcare;
 
-
 import android.os.Handler;
+import android.os.HandlerThread;
 import android.util.Log;
 
 import com.facebook.react.bridge.Arguments;
@@ -9,7 +9,6 @@ import com.facebook.react.bridge.LifecycleEventListener;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
-import com.facebook.react.bridge.Callback;
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
@@ -43,23 +42,34 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
 
     private final ReactApplicationContext reactContext;
     private QNBleApi mQNBleApi;
+
+    private QNBleDevice connectedDevice;
     public User mUser = new User();
     public static final String FORMAT_SHORT = "yyyy-MM-dd";
 
-    public BleQnsdkModule(ReactApplicationContext reactContext) {
+    private Handler backgroundHandler;
 
+    public BleQnsdkModule(ReactApplicationContext reactContext) {
         super(reactContext);
 
         reactContext.addLifecycleEventListener(this);
         this.reactContext = reactContext;
+
+        HandlerThread handlerThread = new HandlerThread("BleQnsdkModuleInit");
+        handlerThread.start();
+        backgroundHandler = new Handler(handlerThread.getLooper());
+
+        // Move initialization to the background thread
+        backgroundHandler.post(() -> {
+            this.initializeListeners();
+        });
     }
 
-    public void initialize() {
-        final ReactApplicationContext context = getReactApplicationContext();
-        mQNBleApi = QNBleApi.getInstance(context);
+    public void initializeListeners() {
+        mQNBleApi = QNBleApi.getInstance(reactContext);
+        initSDK();
         this.setConfig();
 
-        this.initSDK();
         this.setDiscoveryListener();
         this.setConnectionListener();
         this.setDataListener();
@@ -75,7 +85,7 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
         mQnConfig.save(new QNResultCallback() {
             @Override
             public void onResult(int i, String s) {
-                Log.d("ScanActivity", "initData:" + s);
+                Log.d("Yolanda setConfig", "initData:" + s);
             }
         });
     }
@@ -85,26 +95,25 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
         mQNBleApi.initSdk("Lexington202004", encryptPath, new QNResultCallback() {
             @Override
             public void onResult(int code, String msg) {
-                Log.d("BaseApplication", "Initialization file\n" + msg);
-                Log.d("BaseApplication", "Initialization code\n" + code);
+                Log.d("Yolanda Scale", "Initialization file\n" + msg);
+                Log.d("Yolanda Scale", "Initialization code\n" + code);
             }
         });
-
     }
 
     @Override
     public void onHostResume() {
-        this.initialize();
+        Log.w("Yolanda Scale", "on onHostResume");
     }
 
     @Override
     public void onHostPause() {
-        Log.w("Scale", "on onHostPause");
+        Log.w("Yolanda Scale", "on onHostPause");
     }
 
     @Override
     public void onHostDestroy() {
-        Log.w("S", "on onHostDestroy");
+        Log.w("Yolanda Scale", "on onHostDestroy");
     }
 
     private QNUser createQNUser() {
@@ -157,20 +166,22 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
                 userShape, userGoal, mUser.getClothesWeight(), new QNResultCallback() {
                     @Override
                     public void onResult(int code, String msg) {
-                        Log.d("ConnectActivity", "Response:" + msg);
+                        Log.d("Yolanda ConnectActivity", "Response:" + msg);
                     }
                 });
     }
 
     @Override
     public String getName() {
-        return "QNSDKManager";
+        return "BleQnsdk";
     }
 
     @ReactMethod
-    public void buildUser(String name, String birthday, int height, String gender, String id, int unit, int athleteType, Promise promise) {
+    public void buildUser(String birthday, int height, String gender, String id, int unit, int athleteType,
+            Promise promise) {
         try {
-            SimpleDateFormat sdf = new SimpleDateFormat(FORMAT_SHORT); // here set the pattern as you date in string was containing like date/month/year
+            SimpleDateFormat sdf = new SimpleDateFormat(FORMAT_SHORT); // here set the pattern as you date in string was
+                                                                       // containing like date/month/year
             Date formattedBirthday = sdf.parse(birthday);
 
             this.mUser.setAthleteType(athleteType);
@@ -183,50 +194,86 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
 
             QNConfig mQnConfig = mQNBleApi.getConfig();
             mQnConfig.setUnit(unit);
-            Log.d("BaseApplication", "buildUser file\n");
-            promise.resolve("build user success");
+            promise.resolve("Yolanda build user success");
         } catch (IllegalViewOperationException | ParseException e) {
-            Log.d("CATCH ERROR", String.valueOf(e));
             setBleStatusWithError(e, "Build user error");
-            promise.reject("build user reject", e);
+            promise.reject("Yolanda build user reject", e);
         }
     }
 
-    private void setBleStatus(String bleStatus, String deviceId) {
+    public WritableMap getDeviceInfo(QNBleDevice device) {
+        WritableMap infoMap = Arguments.createMap();
+        infoMap.putString("id", device.getMac());
+        infoMap.putString("name", device.getName());
+        infoMap.putString("modeId", device.getModeId());
+        infoMap.putString("bluetoothName", device.getBluetoothName());
+        infoMap.putInt("deviceType", device.getDeviceType());
+        infoMap.putInt("maxUserNum", device.getMaxUserNum());
+        infoMap.putInt("registeredUserNum", device.getRegisteredUserNum());
+        infoMap.putInt("firmwareVer", device.getFirmwareVer());
+        infoMap.putInt("hardwareVer", device.getHardwareVer());
+        infoMap.putInt("softwareVer", device.getSoftwareVer());
+        return infoMap;
+    }
+
+    public WritableMap getConnectedDeviceInfo() {
+        if (connectedDevice == null) {
+            return Arguments.createMap(); // Return an empty map if device is null
+        }
+        return getDeviceInfo(connectedDevice);
+    }
+
+    private void sendConnectedDeviceInfo() {
         WritableMap params = Arguments.createMap();
-        WritableMap item = Arguments.createMap();
-        params.putString("status", bleStatus);
-        params.putString("deviceId", deviceId);
-        item.putMap("connectionStatus", params);
-        sendEventToJS("uploadProgress", item);
+
+        params.putString("type", "deviceInfo");
+        params.putMap("value", getConnectedDeviceInfo());
+        sendEventToJS("uploadProgress", params);
+    }
+
+    private void connectToDevice(QNBleDevice device) {
+        mQNBleApi.connectDevice(device, createQNUser(), new QNResultCallback() {
+            @Override
+            public void onResult(int code, String msg) {
+                connectedDevice = device;
+                sendConnectedDeviceInfo();
+            }
+        });
     }
 
     private void setBleStatus(String bleStatus) {
         WritableMap params = Arguments.createMap();
-        WritableMap item = Arguments.createMap();
-        params.putString("status", bleStatus);
-        item.putMap("connectionStatus", params);
-        sendEventToJS("uploadProgress", item);
+        WritableMap valueMap = Arguments.createMap();
+        valueMap.putString("status", bleStatus);
+
+        params.putString("type", "connectionStatus");
+        params.putMap("value", valueMap);
+
+        sendEventToJS("uploadProgress", params);
     }
 
     private void setBleStatusWithError(Exception error, String description) {
         WritableMap params = Arguments.createMap();
-        WritableMap item = Arguments.createMap();
-        params.putString("status", "error");
-        params.putString("error", String.valueOf(error));
-        params.putString("description", description);
-        item.putMap("connectionStatus", params);
-        sendEventToJS("uploadProgress", item);
+        WritableMap valueMap = Arguments.createMap();
+        valueMap.putString("status", "error");
+        valueMap.putString("error", String.valueOf(error));
+        valueMap.putString("description", description);
+
+        params.putString("type", "connectionStatus");
+        params.putMap("value", valueMap);
+        sendEventToJS("uploadProgress", params);
     }
 
     private void setBleStatusWithError(int error, String description) {
         WritableMap params = Arguments.createMap();
-        WritableMap item = Arguments.createMap();
-        params.putString("status", "error");
-        params.putString("error", String.valueOf(error));
-        params.putString("description", description);
-        item.putMap("connectionStatus", params);
-        sendEventToJS("uploadProgress", item);
+        WritableMap valueMap = Arguments.createMap();
+        valueMap.putString("status", "error");
+        valueMap.putString("error", String.valueOf(error));
+        valueMap.putString("description", description);
+
+        params.putString("type", "connectionStatus");
+        params.putMap("value", valueMap);
+        sendEventToJS("uploadProgress", params);
     }
 
     private void setConnectionListener() {
@@ -238,18 +285,18 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
 
             @Override
             public void onConnected(QNBleDevice device) {
-                setBleStatus("onConnected", device.getModeId());
+                setBleStatus("onConnected");
             }
 
             @Override
             public void onServiceSearchComplete(QNBleDevice device) {
                 setBleStatus("onServiceSearchComplete");
             }
-// Leaving this here for SDK update
-//      @Override
-//      public void onStartInteracting(QNBleDevice qnBleDevice) {
-//        setBleStatus("onStartInteracting");
-//      }
+
+            @Override
+            public void onStartInteracting(QNBleDevice qnBleDevice) {
+                setBleStatus("onStartInteracting");
+            }
 
             @Override
             public void onDisconnecting(QNBleDevice device) {
@@ -258,10 +305,6 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
 
             @Override
             public void onDisconnected(QNBleDevice device) {
-                WritableMap params = Arguments.createMap();
-                params.putString("scaleStateChange", "0");
-                sendEventToJS("uploadProgress", params);
-
                 setBleStatus("disconnected");
             }
 
@@ -295,125 +338,132 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
                 } catch (IllegalViewOperationException e) {
                     return weight;
                 }
-            }
-
-            ;
+            };
 
             @Override
             public void onGetUnsteadyWeight(QNBleDevice device, double weight) {
                 double finalWeight = convertWeight(weight);
 
-                WritableMap measurement = Arguments.createMap();
+                WritableMap valueMap = Arguments.createMap();
                 WritableMap params = Arguments.createMap();
-                measurement.putDouble("weight", finalWeight);
-                params.putMap("measurement", measurement);
+
+                valueMap.putDouble("weight", finalWeight);
+
+                params.putString("type", "temporaryMeasurementReceived");
+                params.putMap("value", valueMap);
+
                 sendEventToJS("uploadProgress", params);
             }
 
             @Override
             public void onGetScaleData(QNBleDevice device, QNScaleData data) {
                 WritableMap params = Arguments.createMap();
+                WritableMap valueMap = Arguments.createMap();
 
                 QNScaleItemData value = data.getItem(QNIndicator.TYPE_BMR);
                 if (value != null) {
-                    params.putDouble("basalMetabolicRate", value.getValue());
+                    valueMap.putDouble("basalMetabolicRate", value.getValue());
                 }
 
                 value = data.getItem(QNIndicator.TYPE_VISFAT);
                 if (value != null) {
-                    params.putDouble("visceralFatTanita", value.getValue());
+                    valueMap.putDouble("visceralFatTanita", value.getValue());
                 }
 
                 value = data.getItem(QNIndicator.TYPE_WEIGHT);
                 if (value != null) {
                     double finalWeight = convertWeight(value.getValue());
 
-                    params.putDouble("weight", finalWeight);
+                    valueMap.putDouble("weight", finalWeight);
                 }
 
                 value = data.getItem(QNIndicator.TYPE_LBM);
                 if (value != null) {
-                    params.putDouble("fatFreeMass", value.getValue() * 1000);
+                    valueMap.putDouble("fatFreeMass", value.getValue() * 1000);
                 }
 
                 value = data.getItem(QNIndicator.TYPE_BODYFAT);
                 if (value != null) {
-                    params.putDouble("bodyFat", value.getValue() * 1000);
+                    valueMap.putDouble("bodyFat", value.getValue() * 1000);
                 }
 
                 value = data.getItem(QNIndicator.TYPE_WATER);
                 if (value != null) {
-                    params.putDouble("waterPercentage", value.getValue() * 1000);
+                    valueMap.putDouble("waterPercentage", value.getValue() * 1000);
                 }
 
-                // muscle mass	Muscle mass	Kg
+                // muscle mass Muscle mass Kg
                 value = data.getItem(QNIndicator.TYPE_MUSCLE_MASS);
                 if (value != null) {
                     double finalWeight = convertWeight(value.getValue());
-                    params.putDouble("muscleMass", finalWeight);
+                    valueMap.putDouble("muscleMass", finalWeight);
                 }
 
-                // 	Skeletal muscle rate	%
+                // Skeletal muscle rate %
                 value = data.getItem(QNIndicator.TYPE_MUSCLE);
                 if (value != null) {
-                    params.putDouble("skeletalMuscleRatio", value.getValue() * 1000);
+                    valueMap.putDouble("skeletalMuscleRatio", value.getValue() * 1000);
                 }
 
                 value = data.getItem(QNIndicator.TYPE_BONE);
                 if (value != null) {
                     double finalWeight = convertWeight(value.getValue());
-                    params.putDouble("boneWeight", finalWeight);
+                    valueMap.putDouble("boneWeight", finalWeight);
                 }
 
-                WritableMap measurement = Arguments.createMap();
-                measurement.putMap("measurement", params);
+                params.putString("type", "finalMeasurementReceived");
+                params.putMap("value", valueMap);
 
-                sendEventToJS("uploadProgress", measurement);
+                sendEventToJS("uploadProgress", params);
             }
 
             @Override
             public void onGetStoredScale(QNBleDevice device, List<QNScaleStoreData> storedDataList) {
-                Log.d("onGetStoredScale ", String.valueOf(storedDataList));
+                Log.d("Yolanda onGetStordScale", String.valueOf(storedDataList));
             }
 
             @Override
             public void onGetElectric(QNBleDevice device, int electric) {
-                Log.d("onGetElectric ", String.valueOf(electric));
+                Log.d("Yolanda onGetElectric ", String.valueOf(electric));
             }
 
             @Override
             public void onScaleStateChange(QNBleDevice device, int status) {
                 WritableMap params = Arguments.createMap();
-                params.putString("scaleStateChange", String.valueOf(status));
+
+                params.putString("type", "scaleStateChange");
+                params.putInt("value", status);
                 sendEventToJS("uploadProgress", params);
             }
 
             @Override
             public void onScaleEventChange(QNBleDevice qnBleDevice, int i) {
+                WritableMap params = Arguments.createMap();
+
+                params.putString("type", "onScaleEventChange");
+                params.putInt("value", i);
+
+                sendEventToJS("uploadProgress", params);
             }
-// Leaving this here for SDK update
-//      @Override
-//      public void readSnComplete(QNBleDevice qnBleDevice, String s) {
-//
-//      }
+
+            @Override
+            public void readSnComplete(QNBleDevice qnBleDevice, String s) {
+                Log.d("Yolanda readSnComplete", String.valueOf(qnBleDevice));
+            }
+
         });
     }
-
 
     public void setDiscoveryListener() {
         mQNBleApi.setBleDeviceDiscoveryListener(new QNBleDeviceDiscoveryListener() {
             @Override
             public void onDeviceDiscover(QNBleDevice device) {
-                mQNBleApi.connectDevice(device, createQNUser(), new QNResultCallback() {
-                    @Override
-                    public void onResult(int code, String msg) {
-                    }
-                });
-
+                connectToDevice(device);
             }
 
             @Override
             public void onStartScan() {
+                Log.d("Yolanda onStartScan", "start");
             }
 
             @Override
@@ -421,8 +471,6 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
                 mQNBleApi.stopBleDeviceDiscovery(new QNResultCallback() {
                     @Override
                     public void onResult(int code, String msg) {
-                        if (code == CheckStatus.OK.getCode()) {
-                        }
                     }
                 });
             }
@@ -434,32 +482,33 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
 
             @Override
             public void onBroadcastDeviceDiscover(QNBleBroadcastDevice qnBleBroadcastDevice) {
+                Log.d("Yolanda onBrodDiscover", String.valueOf(qnBleBroadcastDevice));
 
             }
 
             @Override
             public void onKitchenDeviceDiscover(QNBleKitchenDevice qnBleKitchenDevice) {
+                Log.d("Yolanda onKitchDiscover", String.valueOf(qnBleKitchenDevice));
             }
         });
     }
 
     @ReactMethod
-    public void onStartDiscovery(String name, final Promise promise) {
+    public void onStartDiscovery(final Promise promise) {
         Handler mHandler = new Handler();
         mHandler.post(new Runnable() {
 
             @Override
             public void run() {
+
                 mQNBleApi.startBleDeviceDiscovery(new QNResultCallback() {
                     @Override
                     public void onResult(int code, String msg) {
-                        Log.d("onResult code ", String.valueOf(code));
-                        Log.d("onResult mesg", String.valueOf(code));
                         if (code == CheckStatus.OK.getCode()) {
-                            promise.resolve(true);
-                        }
-                        if (code != CheckStatus.OK.getCode()) {
-                          setBleStatusWithError(code, "startBleDeviceDiscovery");
+                            promise.resolve(code);
+                        } else {
+                            setBleStatusWithError(code, "startBleDeviceDiscovery");
+                            promise.reject("startBleDeviceDiscovery", String.valueOf(code));
                         }
                     }
                 });
@@ -468,26 +517,21 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
     }
 
     @ReactMethod
-    public void stopScan(final Callback callback) {
+    public void onStopDiscovery(final Promise promise) {
         mQNBleApi.stopBleDeviceDiscovery(new QNResultCallback() {
             @Override
             public void onResult(int code, String msg) {
                 if (code == CheckStatus.OK.getCode()) {
-                    callback.invoke("stopScan: ");
+                    promise.resolve(code);
+                } else {
+                    promise.reject("onStopDiscovery", String.valueOf(code));
                 }
             }
         });
-
     }
 
     @ReactMethod
-    public void onStopDiscovery() {
-        mQNBleApi.stopBleDeviceDiscovery(new QNResultCallback() {
-            @Override
-            public void onResult(int code, String msg) {
-
-            }
-        });
-
+    public void fetchConnectedDeviceInfo() {
+        sendConnectedDeviceInfo();
     }
 }

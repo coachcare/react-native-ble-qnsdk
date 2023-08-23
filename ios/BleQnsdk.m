@@ -1,24 +1,21 @@
-#import "BleQnsdk.h"
+#import "QNDeviceSDK.h"
+#import "QNConfig.h"
+#import "QNBleConnectionChangeProtocol.h"
 #import <React/RCTBridgeModule.h>
+#import <React/RCTEventEmitter.h>
 
-@interface RCT_EXTERN_MODULE(QNSDKManager, NSObject)
-RCT_EXTERN_METHOD(buildUser:(NSString *)name birthday:(NSString *)birthday height:(NSInteger *)height gender:(NSString *)gender id:(NSString *)id unit:(NSInteger *)unit athleteType:(NSInteger *)athleteType resolver: (RCTPromiseResolveBlock)resolve
+@interface RCT_EXTERN_MODULE(BleQnsdk, NSObject)
+RCT_EXTERN_METHOD(buildUser:(NSString)birthday height:(NSInteger)height gender:(NSString)gender id:(NSString)id unit:(NSInteger)unit athleteType:(NSInteger)athleteType  resolver: (RCTPromiseResolveBlock)resolve
     rejecter: (RCTPromiseRejectBlock)reject)
-RCT_EXTERN_METHOD(onStartDiscovery:(NSString *)name resolver:(RCTPromiseResolveBlock)resolve
+RCT_EXTERN_METHOD(onStartDiscovery:(RCTPromiseResolveBlock)resolve
     rejecter: (RCTPromiseRejectBlock)reject)
-    RCT_EXTERN_METHOD(onStopDiscovery)
-
-- (dispatch_queue_t)methodQueue
-{
-    return dispatch_get_main_queue();
-}
+RCT_EXTERN_METHOD(onStopDiscovery:(RCTPromiseResolveBlock)resolve
+                  rejecter: (RCTPromiseRejectBlock)reject)
+RCT_EXTERN_METHOD(fetchConnectedDeviceInfo)
 
 + (BOOL)requiresMainQueueSetup
 {
-    return YES;
+    return NO;
 }
 
-@end
-
-@interface QNSDKManager (RCTExternModule) <RCTBridgeModule>
 @end

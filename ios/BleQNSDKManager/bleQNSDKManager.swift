@@ -1,25 +1,23 @@
 //
-//  BleQNSDKManager.swift
+//  BleBleQnsdk.swift
 //  react-native-ble-qnsdk
 //
 //  Created by Jeffrey Drakos on 4/10/20.
 //
 
+import React // for RCTEventEmitter
 import Foundation
 import CoreBluetooth
 
-
-@objc(QNSDKManager)
-public class QNSDKManager : RCTEventEmitter {
+@objc(BleQnsdk)
+public class BleQnsdk: RCTEventEmitter  {
     var bleApi: QNBleApi!
     var user: QNUser!
     var device: QNBleDevice!
-    var scaleDataAry: [AnyHashable] = []
-    
+
     override public func supportedEvents() -> [String]! {
-        return ["uploadProgress"]
+        return [EventEmitterState.uploadProgress.rawValue]
     }
-    
     
     override init() {
         super.init()
@@ -31,24 +29,26 @@ public class QNSDKManager : RCTEventEmitter {
         bleApi.connectionChangeListener = self
         bleApi.dataListener = self
     }
-    
-    @objc(buildUser:birthday:height:gender:id:unit:athleteType:resolver:rejecter:)
-    func buildUser(name: String, birthday: String, height: Int, gender: String, id: String, unit: Int, athleteType: Int, resolver resolve: RCTPromiseResolveBlock,
-                   rejecter reject: RCTPromiseRejectBlock) {
-        let dateStr = birthday
-        let dateFormat = DateFormatter()
-        dateFormat.dateFormat = "yyyy/MM/dd"
-        let date = dateFormat.date(from: dateStr)
+
+    @objc func buildUser(_ birthday: String, height: Int, gender: String, id: String, unit: Int, athleteType: Int, resolver resolve: @escaping RCTPromiseResolveBlock,
+                         rejecter reject: @escaping RCTPromiseRejectBlock) {
+        let birthdayDateFormatter = DateFormatter()
+        birthdayDateFormatter.dateFormat = "yyyy/MM/dd"
+        let date = birthdayDateFormatter.date(from: birthday)
         
         self.user = bleApi.buildUser(id, height: Int32(height), gender: gender, birthday: date, callback: { error in
             if (error != nil) {
-                self.sendEvent(withName: "uploadProgress", body: [
-                    "connectionStatus": [
-                        "status": "error",
-                        "error": error,
-                        "description": "Build user error"
+                self.sendEvent(
+                    withName: EventEmitterState.uploadProgress.rawValue,
+                    body: [
+                        "type": EventEmitterState.connectionStatus.rawValue,
+                        "value": [
+                            "status": ConnectionStatusState.error.rawValue,
+                            "error": error,
+                            "description": ConnectionStatusDescription.buildUserErrorDescription.rawValue
+                        ]
                     ]
-                ])
+                )
             }
             
         })
@@ -59,72 +59,129 @@ public class QNSDKManager : RCTEventEmitter {
         config?.unit = unit == 0 ? QNUnit.KG : QNUnit.LB
         resolve(true)
     }
-    
-    @objc(onStartDiscovery:resolver:rejecter:)
-    func onStartDiscovery(name:String, resolve: RCTPromiseResolveBlock,
-                          rejecter reject: RCTPromiseRejectBlock) {
-        bleApi.startBleDeviceDiscovery({ error in
-            // This callback indicates whether the startup scan method is successful
-            if((error) != nil) {
-                do {
-                    if let error = error {
-                        print("Failed to start the scan method, reason: \(error)")
-                        self.sendEvent(withName: "uploadProgress", body: [
-                            "connectionStatus": [
-                                "status": "error",
-                                "error": error,
-                                "description": "Start Ble Discovery Error"
-                            ]
-                        ])
-                        
-                    }
-                }
+
+    @objc
+    func onStartDiscovery(_ resolve: @escaping RCTPromiseResolveBlock,
+                        rejecter reject: @escaping RCTPromiseRejectBlock) {
+        bleApi.startBleDeviceDiscovery { error in
+            if let error = error {
+                let errorMessage = "Failed to start the scan method, reason: \(error)"
+                let errorCode = "BLE_DISCOVERY_ERROR"
+                reject(errorCode, errorMessage, error)
+                return
             }
-        })
-        resolve(true)
-        
+            
+            resolve(true)
+        }
+    }
+
+    @objc
+    func onStopDiscovery(resolve: @escaping RCTPromiseResolveBlock,
+                        rejecter reject: @escaping RCTPromiseRejectBlock) {
+        bleApi.stopBleDeviceDiscorvery { error in
+            if let error = error {
+                let errorMessage = "Failed to stop the scan method, reason: \(error)"
+                let errorCode = "BLE_STOP_DISCOVERY_ERROR"
+                reject(errorCode, errorMessage, error)
+                return
+            }
+            
+            resolve(true)
+        }
+    }
+
+    @objc
+    func fetchConnectedDeviceInfo() {
+        sendConnectedDeviceInfo()
     }
     
-    @objc(onStopDiscovery)
-    func onStopDiscovery() {
-        bleApi.stopBleDeviceDiscorvery({ error in
-            // This callback indicates whether the startup scan method is successful
-            if((error) != nil) {
-                do {
-                    if let error = error {
-                        print("Failed to stop the scan method, reason: \(error)")
-                    }
-                }
-            }
-        })
+    func getDeviceInfo(device: QNBleDevice!) -> [String : Any] {
+        return [
+            "id": device.mac,
+            "name": device.name,
+            "modeId": device.modeId,
+            "bluetoothName": device.bluetoothName,
+            "deviceType": device.deviceType,
+            "maxUserNum": device.maxUserNum,
+            "registeredUserNum": device.registeredUserNum,
+            "firmwareVer": device.firmwareVer,
+            "hardwareVer": device.hardwareVer,
+            "softwareVer": device.softwareVer
+        ]
     }
     
+    func getConnectedDeviceInfo() -> [String : Any] {
+        if (self.device == nil) {
+            return [:]
+        }
+
+        return getDeviceInfo(device: self.device)
+    }
+
     func onTryConnect() {
-        self.onStopDiscovery()
+        connectToDevice()
+    }
+
+    func connectToDevice() {
+        onStopDiscovery(
+            resolve: { _ in
+                self.startConnection()
+            },
+            rejecter: { (_, _, _) in
+                self.startConnection()
+            }
+        )
+    }
+
+    func startConnection() {
         bleApi.connect(self.device, user: self.user, callback: { error in
-            // This callback indicates whether the startup scan method is successful
-            if((error) != nil) {
-                do {
-                    if let error = error {
-                        print("Failed to connect, reason: \(error)")
-                        self.sendEvent(withName: "uploadProgress", body: [
-                            "connectionStatus": [
-                                "status": "error",
-                                "error": error,
-                                "description": "Connection Error"
-                            ]
-                        ])
-                    }
-                }
+            if let error = error {
+                self.handleConnectionError(error)
             }
         })
-        
     }
     
+    func sendConnectedDeviceInfo() {
+        self.sendEvent(
+            withName: EventEmitterState.uploadProgress.rawValue,
+            body: [
+                "type": EventEmitterState.deviceInfo.rawValue,
+                "value": getConnectedDeviceInfo()
+            ]
+        )
+    }
+
+
+    func handleConnectionError(_ error: Error) {
+        self.sendEvent(
+            withName: EventEmitterState.uploadProgress.rawValue,
+            body: [
+                "type": EventEmitterState.connectionStatus.rawValue,
+                "value": [
+                    "status": ConnectionStatusState.error.rawValue,
+                    "error": error,
+                    "description": ConnectionStatusDescription.connectionErrorDescription.rawValue
+                ]
+            ]
+        )
+    }
+    
+    func convertPoundsToGrams(_ weight: Double) -> Double {
+        var finalWeight = weight * 1000
+        
+        // In order to have the same value for lb's in the app, convert from lb's to grams
+        if bleApi.getConfig().unit == QNUnit.LB {
+            let pounds = bleApi.convertWeight(withTargetUnit: weight, unit: QNUnit.LB)
+            let convertedWeight = 453.59237 * pounds
+            finalWeight = convertedWeight
+        }
+        
+        return finalWeight
+    }
     
 }
 
-extension QNSDKManager: QNBleDeviceDiscoveryListener {
+extension BleQnsdk: QNBleDeviceDiscoveryListener {
     public func onStartScan() {
         print("On start scan")
     }
@@ -133,85 +190,105 @@ extension QNSDKManager: QNBleDeviceDiscoveryListener {
         self.device = device
         self.onTryConnect()
     }
-    
 }
 
-extension QNSDKManager: QNBleConnectionChangeListener {
+extension BleQnsdk: QNBleConnectionChangeListener {
     public func onDisconnected(_ device: QNBleDevice!) {
-        self.sendEvent(withName: "uploadProgress", body: [
-            "connectionStatus": [
-                "status": "onDisconnected"
+
+        self.sendEvent(
+            withName: EventEmitterState.uploadProgress.rawValue,
+            body: [
+                "type": EventEmitterState.connectionStatus.rawValue,
+                "value": [
+                    "status": ConnectionStatusState.onDisconnected.rawValue
+                ]
             ]
-        ])
+        )
         
     }
     public func onConnecting(_ device: QNBleDevice!) {
-        self.sendEvent(withName: "uploadProgress", body: [
-            "connectionStatus": [
-                "status": "onConnecting",
-                "deviceId": device.modeId
+        
+        self.sendEvent(
+            withName: EventEmitterState.uploadProgress.rawValue,
+            body: [
+                "type": EventEmitterState.connectionStatus.rawValue,
+                "value": [
+                    "status": ConnectionStatusState.onConnecting.rawValue
+                ]
             ]
-        ])
-        
-        
-        
+        )
     }
     
     public func onConnected(_ device: QNBleDevice!) {
-        self.sendEvent(withName: "uploadProgress", body: [
-            "connectionStatus": [
-                "status": "onConnected",
-                "deviceId": device.modeId
+        self.device = device
+
+        self.sendEvent(
+            withName: EventEmitterState.uploadProgress.rawValue,
+            body: [
+                "type": EventEmitterState.connectionStatus.rawValue,
+                "value": [
+                    "status": ConnectionStatusState.onConnected.rawValue,
+                    "device": getDeviceInfo(device: device)
+                ]
             ]
-        ])
+        )
+        
+        self.sendConnectedDeviceInfo()
     }
     
     public func onServiceSearchComplete(_ device: QNBleDevice!) {
-        print("onServiceSearchComplete")
-        self.sendEvent(withName: "uploadProgress", body: [
-            "connectionStatus": [
-                "status": "onServiceSearchComplete"
+        self.sendEvent(
+            withName: EventEmitterState.uploadProgress.rawValue,
+            body: [
+                "type": EventEmitterState.connectionStatus.rawValue,
+                "value": [
+                    "status": ConnectionStatusState.onServiceSearchComplete.rawValue
+                ]
             ]
-        ])
+        )
     }
     
     public func onDisconnecting(_ device: QNBleDevice!) {
-        print("onDisconnecting")
-        self.sendEvent(withName: "uploadProgress", body: [
-            "connectionStatus": [
-                "status": "onDisconnecting"
+        self.sendEvent(
+            withName: EventEmitterState.uploadProgress.rawValue,
+            body: [
+                "type": EventEmitterState.connectionStatus.rawValue,
+                "value": [
+                    "status": ConnectionStatusState.onDisconnecting.rawValue
+                ]
             ]
-        ])
+        )
     }
     
     public func onConnectError(_ device: QNBleDevice!, error: Error!) {
-        self.sendEvent(withName: "uploadProgress", body: [
-            "connectionStatus": [
-                "status": "error",
-                "error": error
-            ]
-        ])
+        self.sendEvent(
+            withName: EventEmitterState.uploadProgress.rawValue,
+            body: [
+                "type": EventEmitterState.connectionStatus.rawValue,
+                "value": [
+                    "status": ConnectionStatusState.error.rawValue,
+                    "error": error
+                ]
+                ]
+        )
     }
     
 }
 
-extension QNSDKManager: QNScaleDataListener {
+extension BleQnsdk: QNScaleDataListener {
     public func onGetUnsteadyWeight(_ device: QNBleDevice!, weight: Double) {
-        var finalWeight = weight * 1000
+        let finalWeight = convertPoundsToGrams(weight)
+
         
-        // In order to have the same value for lb's in the app we must convert from lb's to grams
-        if (bleApi.getConfig().unit == QNUnit.LB) {
-            let pounds = bleApi.convertWeight(withTargetUnit: weight, unit: QNUnit.LB)
-            let convertedWeight = 453.59237 * pounds
-            finalWeight = convertedWeight
-        }
-        
-        self.sendEvent(withName: "uploadProgress", body: [
-            "measurement": [
-                "scaleId": device.modeId,
-                "weight": finalWeight
+        self.sendEvent(
+            withName: EventEmitterState.uploadProgress.rawValue,
+            body: [
+                "type": EventEmitterState.temporaryMeasurementReceived.rawValue,
+                "value": [
+                    "weight": finalWeight
+                ]
             ]
-        ])
+        )
     }
     
     public func filterResponse(_ scaleData: [QNScaleItemData]) -> [String:Any]? {
@@ -225,16 +302,7 @@ extension QNSDKManager: QNScaleDataListener {
                 response["visceralFatTanita"] = item.value
             }
             if (item.name == "weight") {
-                var finalWeight = item.value * 1000
-                
-                // In order to have the same value for lb's in the app we must convert from lb's to grams
-                if (bleApi.getConfig().unit == QNUnit.LB) {
-                    let pounds = bleApi.convertWeight(withTargetUnit: item.value, unit: QNUnit.LB)
-                    let convertedWeight = 453.59237 * pounds
-                    finalWeight = convertedWeight
-                }
-                
-                response["weight"] = finalWeight
+                response["weight"] = convertPoundsToGrams(item.value)
             }
             if (item.name == "lean body weight") {
                 response["fatFreeMass"] = (item.value * 1000)
@@ -260,31 +328,46 @@ extension QNSDKManager: QNScaleDataListener {
     public func onGetScaleData(_ device: QNBleDevice!, data scaleData: QNScaleData!) {
         let data = self.filterResponse(scaleData.getAllItem())
         
-        self.sendEvent(withName: "uploadProgress", body: [
-            "measurement":
-                data
-        ])
+        self.sendEvent(
+            withName: EventEmitterState.uploadProgress.rawValue,
+            body: [
+                "type": EventEmitterState.finalMeasurementReceived.rawValue,
+                "value": data
+            ]
+        )
+
     }
     
     public func onGetStoredScale(_ device: QNBleDevice!, data storedDataList: [QNScaleStoreData]!) {
+        print("onGetStoredScale")
+        print(storedDataList)
+
     }
     
     public func onGetElectric(_ electric: UInt, device: QNBleDevice!) {
+        print("onGetElectric", electric)
     }
     
     public func onScaleStateChange(_ device: QNBleDevice!, scaleState state: QNScaleState) {
-        self.sendEvent(withName: "uploadProgress", body: [
-            "scaleStateChange": state.rawValue
-        ])
+        self.sendEvent(
+            withName: EventEmitterState.uploadProgress.rawValue,
+            body: [
+                "type": EventEmitterState.scaleStateChange.rawValue,
+                "value": state.rawValue
+            ]
+        )
+
         
     }
     
     public func onScaleEventChange(_ device: QNBleDevice!, scaleEvent: QNScaleEvent) {
-        self.sendEvent(withName: "uploadProgress", body: [
-            "scaleEventChange": [
+        self.sendEvent(
+            withName: EventEmitterState.uploadProgress.rawValue,
+            body: [
+                "type": EventEmitterState.scaleEventChange.rawValue,
                 "value": scaleEvent
             ]
-        ])
+        )
     }
     
 }
