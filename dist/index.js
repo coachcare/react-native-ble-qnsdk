@@ -1,9 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ScaleEventValue = exports.MeasurementResponse = exports.fetchConnectedDeviceInfo = exports.stopYolandaScan = exports.startYolandaScan = exports.buildYolandaUser = exports.QNSDKEmitter = exports.BleQnsdk = void 0;
+exports.YolandaEventTypeEnum = exports.fetchConnectedDeviceInfo = exports.stopYolandaScan = exports.startYolandaScan = exports.buildYolandaUser = exports.QNSDKEmitter = exports.BleQnsdk = void 0;
 const types_1 = require("./types");
-Object.defineProperty(exports, "MeasurementResponse", { enumerable: true, get: function () { return types_1.MeasurementResponse; } });
-Object.defineProperty(exports, "ScaleEventValue", { enumerable: true, get: function () { return types_1.ScaleEventValue; } });
+Object.defineProperty(exports, "YolandaEventTypeEnum", { enumerable: true, get: function () { return types_1.YolandaEventTypeEnum; } });
 const react_native_1 = require("react-native");
 const LINKING_ERROR = `The package 'react-native-ble-qnsdk' doesn't seem to be linked. Make sure: \n\n` +
     react_native_1.Platform.select({ ios: "- You have run 'pod install'\n", default: "" }) +

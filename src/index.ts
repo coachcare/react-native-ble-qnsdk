@@ -1,9 +1,14 @@
 import {
   ConnectionStatus,
+  ConnectionStatusEmitter,
+  DeviceInfoEvent,
+  FinalMeasurementEvent,
   IYolandaUser,
-  MeasurementResponse,
-  ScaleEventValue,
+  ScaleEventChangeEvent,
+  ScaleStateChangeEvent,
+  TemporaryMeasurementEvent,
   YolandaEventEmitter,
+  YolandaEventTypeEnum,
 } from "./types";
 import { NativeEventEmitter, NativeModules, Platform } from "react-native";
 
@@ -58,7 +63,12 @@ export {
   fetchConnectedDeviceInfo,
   IYolandaUser,
   ConnectionStatus,
-  MeasurementResponse,
-  ScaleEventValue,
+  TemporaryMeasurementEvent,
+  FinalMeasurementEvent,
+  ScaleEventChangeEvent,
+  ScaleStateChangeEvent,
+  DeviceInfoEvent,
+  ConnectionStatusEmitter,
   YolandaEventEmitter,
+  YolandaEventTypeEnum,
 };

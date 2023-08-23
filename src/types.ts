@@ -76,3 +76,12 @@ export type YolandaEventEmitter =
   | ScaleStateChangeEvent
   | DeviceInfoEvent
   | ConnectionStatusEmitter;
+
+export enum YolandaEventTypeEnum {
+  DEVICE_INFO = "deviceInfo",
+  SCALE_STATE_CHANGE = "scaleStateChange",
+  SCALE_EVENT_CHANGE = "scaleEventChange",
+  FINAL_MEASUREMENT_EVENT = "finalMeasurementReceived",
+  TEMPORARY_MEASUREMENT_EVENT = "temporaryMeasurementReceived",
+  CONNECTION_STATUS = "connectionStatus",
+}

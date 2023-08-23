@@ -60,3 +60,11 @@ export interface DeviceInfoEvent {
     value: YolandaDeviceInfo;
 }
 export type YolandaEventEmitter = TemporaryMeasurementEvent | FinalMeasurementEvent | ScaleEventChangeEvent | ScaleStateChangeEvent | DeviceInfoEvent | ConnectionStatusEmitter;
+export declare enum YolandaEventTypeEnum {
+    DEVICE_INFO = "deviceInfo",
+    SCALE_STATE_CHANGE = "scaleStateChange",
+    SCALE_EVENT_CHANGE = "scaleEventChange",
+    FINAL_MEASUREMENT_EVENT = "finalMeasurementReceived",
+    TEMPORARY_MEASUREMENT_EVENT = "temporaryMeasurementReceived",
+    CONNECTION_STATUS = "connectionStatus"
+}
