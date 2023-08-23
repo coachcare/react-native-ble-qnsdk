@@ -38,11 +38,28 @@ export interface DeviceInfo {
     hardwareVer: number;
     softwareVer: number;
 }
-export interface YolandaEventEmitter {
-    connectionStatus?: ConnectionStatus;
-    temporaryMeasurementReceived?: TemporaryMeasurementResponse;
-    finalMeasurementReceived?: FinalMeasurementResponse;
-    scaleEventChange?: ScaleEventValue;
-    scaleStateChange?: ScaleEventValue;
-    deviceInfo?: DeviceInfo;
+export interface ConnectionStatusEmitter {
+    type: "connectionStatus";
+    value: ConnectionStatus;
 }
+export interface TemporaryMeasurementEvent {
+    type: "temporaryMeasurementReceived";
+    value: TemporaryMeasurementResponse;
+}
+export interface FinalMeasurementEvent {
+    type: "finalMeasurementReceived";
+    value: FinalMeasurementResponse;
+}
+export interface ScaleEventChangeEvent {
+    type: "scaleEventChange";
+    value: ScaleEventValue;
+}
+export interface ScaleStateChangeEvent {
+    type: "scaleStateChange";
+    value: ScaleEventValue;
+}
+export interface DeviceInfoEvent {
+    type: "deviceInfo";
+    value: DeviceInfo;
+}
+export type YolandaEventEmitter = TemporaryMeasurementEvent | FinalMeasurementEvent | ScaleEventChangeEvent | ScaleStateChangeEvent | DeviceInfoEvent;
