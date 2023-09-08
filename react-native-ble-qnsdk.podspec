@@ -26,5 +26,5 @@ Pod::Spec.new do |s|
   s.requires_arc = true
 
   s.dependency "React"
-  s.dependency "QNSDK", "2.8.20"
+  s.dependency "QNSDK", "2.9.0"
 end
