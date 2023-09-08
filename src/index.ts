@@ -13,7 +13,7 @@ import {
   YolandaEventEmitter,
   YolandaEventTypeEnum,
 } from "./types";
-import { NativeEventEmitter, NativeModules, Platform } from "react-native";
+import { NativeModules, Platform } from "react-native";
 
 const LINKING_ERROR =
   `The package 'react-native-ble-qnsdk' doesn't seem to be linked. Make sure: \n\n` +
@@ -31,8 +31,6 @@ const BleQnsdk = NativeModules.BleQnsdk
         },
       }
     );
-
-const QNSDKEmitter = new NativeEventEmitter(BleQnsdk);
 
 function buildYolandaUser(user: IYolandaUser): Promise<number> {
   return BleQnsdk.buildUser(
@@ -59,7 +57,6 @@ function fetchConnectedDeviceInfo(): void {
 
 export {
   BleQnsdk,
-  QNSDKEmitter,
   buildYolandaUser,
   startYolandaScan,
   stopYolandaScan,
