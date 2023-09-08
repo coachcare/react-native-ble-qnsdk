@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.YolandaEventTypeEnum = exports.fetchConnectedDeviceInfo = exports.stopYolandaScan = exports.startYolandaScan = exports.buildYolandaUser = exports.QNSDKEmitter = exports.BleQnsdk = void 0;
+exports.YolandaEventTypeEnum = exports.fetchConnectedDeviceInfo = exports.stopYolandaScan = exports.startYolandaScan = exports.buildYolandaUser = exports.BleQnsdk = void 0;
 const types_1 = require("./types");
 Object.defineProperty(exports, "YolandaEventTypeEnum", { enumerable: true, get: function () { return types_1.YolandaEventTypeEnum; } });
 const react_native_1 = require("react-native");
@@ -16,8 +16,6 @@ const BleQnsdk = react_native_1.NativeModules.BleQnsdk
         },
     });
 exports.BleQnsdk = BleQnsdk;
-const QNSDKEmitter = new react_native_1.NativeEventEmitter(BleQnsdk);
-exports.QNSDKEmitter = QNSDKEmitter;
 function buildYolandaUser(user) {
     return BleQnsdk.buildUser(user.birthday, user.height, user.gender, user.id, user.unit, user.athleteType);
 }

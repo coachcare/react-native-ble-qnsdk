@@ -35,6 +35,10 @@ export interface YolandaDeviceInfo {
     hardwareVer: number;
     softwareVer: number;
 }
+export interface YolandaLoggingInfo {
+    status: string;
+    device?: YolandaDeviceInfo;
+}
 export interface ConnectionStatusEmitter {
     type: "connectionStatus";
     value: ConnectionStatus;
@@ -59,9 +63,14 @@ export interface DeviceInfoEvent {
     type: "deviceInfo";
     value: YolandaDeviceInfo;
 }
-export type YolandaEventEmitter = TemporaryMeasurementEvent | FinalMeasurementEvent | ScaleEventChangeEvent | ScaleStateChangeEvent | DeviceInfoEvent | ConnectionStatusEmitter;
+export interface YolandaLoggingEvent {
+    type: "logging";
+    value: YolandaDeviceInfo;
+}
+export type YolandaEventEmitter = TemporaryMeasurementEvent | FinalMeasurementEvent | ScaleEventChangeEvent | ScaleStateChangeEvent | DeviceInfoEvent | ConnectionStatusEmitter | YolandaLoggingEvent;
 export declare enum YolandaEventTypeEnum {
     DEVICE_INFO = "deviceInfo",
+    LOGGING = "logging",
     SCALE_STATE_CHANGE = "scaleStateChange",
     SCALE_EVENT_CHANGE = "scaleEventChange",
     FINAL_MEASUREMENT_EVENT = "finalMeasurementReceived",

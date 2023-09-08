@@ -13,9 +13,14 @@ RCT_EXTERN_METHOD(onStopDiscovery:(RCTPromiseResolveBlock)resolve
                   rejecter: (RCTPromiseRejectBlock)reject)
 RCT_EXTERN_METHOD(fetchConnectedDeviceInfo)
 
+- (dispatch_queue_t)methodQueue
+{
+    return dispatch_get_main_queue();
+}
+
 + (BOOL)requiresMainQueueSetup
 {
-    return NO;
+    return YES;
 }
 
 @end
