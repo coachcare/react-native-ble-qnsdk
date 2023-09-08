@@ -67,7 +67,7 @@ export interface YolandaLoggingEvent {
     type: "logging";
     value: YolandaDeviceInfo;
 }
-export type YolandaEventEmitter = TemporaryMeasurementEvent | FinalMeasurementEvent | ScaleEventChangeEvent | ScaleStateChangeEvent | DeviceInfoEvent | ConnectionStatusEmitter | YolandaLoggingInfo;
+export type YolandaEventEmitter = TemporaryMeasurementEvent | FinalMeasurementEvent | ScaleEventChangeEvent | ScaleStateChangeEvent | DeviceInfoEvent | ConnectionStatusEmitter | YolandaLoggingEvent;
 export declare enum YolandaEventTypeEnum {
     DEVICE_INFO = "deviceInfo",
     LOGGING = "logging",

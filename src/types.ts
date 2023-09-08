@@ -86,7 +86,7 @@ export type YolandaEventEmitter =
   | ScaleStateChangeEvent
   | DeviceInfoEvent
   | ConnectionStatusEmitter
-  | YolandaLoggingInfo;
+  | YolandaLoggingEvent;
 
 export enum YolandaEventTypeEnum {
   DEVICE_INFO = "deviceInfo",
