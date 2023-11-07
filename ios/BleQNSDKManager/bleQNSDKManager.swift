@@ -22,8 +22,10 @@ public class BleQnsdk: RCTEventEmitter  {
     override init() {
         super.init()
         bleApi = QNBleApi.shared()
-        let file = Bundle.main.path(forResource: "Lexington202208", ofType: "qn")
-        bleApi.initSdk("Lexington202004", firstDataFile: file, callback: { error in })
+        // let file = Bundle.main.path(forResource: "Lexington202208", ofType: "qn")
+        let podBundle = Bundle(for: BleQnsdk.self)
+        let fileURL = podBundle.url(forResource: "awaken180YolandoTestSdk", withExtension: "qn")
+        bleApi.initSdk("123456789", firstDataFile: file, callback: { error in })
         
         bleApi.discoveryListener = self
         bleApi.connectionChangeListener = self
