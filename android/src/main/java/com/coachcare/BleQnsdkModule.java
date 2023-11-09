@@ -31,10 +31,10 @@ import com.qn.device.out.QNScaleItemData;
 import com.qn.device.out.QNScaleStoreData;
 import com.qn.device.out.QNUser;
 
+import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
 
 import com.qn.device.listener.QNBleConnectionChangeListener;
 
@@ -91,14 +91,19 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
     }
 
     public void initSDK() {
-        String encryptPath = "file:///android_asset/Lexington202208.qn";
-        mQNBleApi.initSdk("Lexington202004", encryptPath, new QNResultCallback() {
-            @Override
-            public void onResult(int code, String msg) {
-                Log.d("Yolanda Scale", "Initialization file\n" + msg);
-                Log.d("Yolanda Scale", "Initialization code\n" + code);
-            }
-        });
+        try {
+            String encryptPath = "file:///android_asset/awaken180YolandoTestSdk.qn";
+            mQNBleApi.initSdk("123456789", encryptPath, new QNResultCallback() {
+                @Override
+                public void onResult(int code, String msg) {
+                    Log.d("Yolanda Scale", "Initialization file\n" + msg);
+                    Log.d("Yolanda Scale", "Initialization code\n" + code);
+                }
+            });
+        } catch (IOException e) {
+            // Handle the exception
+            e.printStackTrace();
+        }
     }
 
     @Override

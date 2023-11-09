@@ -22,14 +22,22 @@ public class BleQnsdk: RCTEventEmitter  {
     override init() {
         super.init()
         bleApi = QNBleApi.shared()
-        let file = Bundle.main.path(forResource: "Lexington202208", ofType: "qn")
-        bleApi.initSdk("Lexington202004", firstDataFile: file, callback: { error in })
-        
-        bleApi.discoveryListener = self
-        bleApi.connectionChangeListener = self
-        bleApi.dataListener = self
+
+        let podBundle = Bundle(for: BleQnsdk.self)
+
+        if let fileURL = podBundle.url(forResource: "awaken180YolandoTestSdk", withExtension: "qn") {
+            let filePath = fileURL.path
+            bleApi.initSdk("123456789", firstDataFile: filePath, callback: { error in
+                // Handle the callback
+                self.bleApi.discoveryListener = self
+                self.bleApi.connectionChangeListener = self
+                self.bleApi.dataListener = self
+            })
+        } else {
+            print("Failed to locate the resource file in the pod bundle.")
+            // Handle the error appropriately
+        }
     }
-    
     
     
     @objc func buildUser(_ birthday: String, height: Int, gender: String, id: String, unit: Int, athleteType: Int, resolver resolve: @escaping RCTPromiseResolveBlock,
