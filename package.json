@@ -35,8 +35,9 @@
   "licenseFilename": "LICENSE",
   "readmeFilename": "README.md",
   "devDependencies": {
+    "@types/react": "^18.2.79",
     "react": "18.2.0",
-    "react-native": "0.71.0",
+    "react-native": "0.73.4",
     "typescript": "^5.1.6"
   }
 }
