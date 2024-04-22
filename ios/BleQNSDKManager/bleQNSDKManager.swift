@@ -99,8 +99,12 @@ public class BleQnsdk: RCTEventEmitter  {
 
     @objc
     func disconnectDevice() {
-        DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
-            self.bleApi.disconnectDevice(self.device, callback: nil)
+        self.bleApi.disconnectDevice(self.device) { (error) in
+            if let error = error {
+                print("Error occurred during disconnection: \(error)")
+            } else {
+                print("Device disconnected successfully")
+            }
         }
     }
     

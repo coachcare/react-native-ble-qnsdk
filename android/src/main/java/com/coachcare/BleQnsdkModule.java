@@ -49,6 +49,10 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
 
     private Handler backgroundHandler;
 
+    private int listenerCount = 0;
+
+
+
     public BleQnsdkModule(ReactApplicationContext reactContext) {
         super(reactContext);
 
@@ -316,6 +320,10 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
     }
 
     public void sendEventToJS(String eventName, WritableMap params) {
+        if (listenerCount == 0) {
+            return;
+        }
+
         this.reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit(eventName, params);
     }
 
@@ -543,5 +551,15 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
                 // Do nothing on disconnection result
             }
         });
+    }
+
+    @ReactMethod
+    public void addListener(String eventName) {
+        listenerCount += 1;
+    }
+
+    @ReactMethod
+    public void removeListeners(Integer count) {
+        listenerCount -= count;
     }
 }
