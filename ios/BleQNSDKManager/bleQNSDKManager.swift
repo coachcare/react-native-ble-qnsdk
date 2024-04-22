@@ -96,6 +96,13 @@ public class BleQnsdk: RCTEventEmitter  {
     func fetchConnectedDeviceInfo() {
         sendConnectedDeviceInfo()
     }
+
+    @objc
+    func disconnectDevice() {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
+            self.bleApi.disconnectDevice(self.device, callback: nil)
+        }
+    }
     
     func getDeviceInfo(device: QNBleDevice!) -> [String : Any] {
         return [

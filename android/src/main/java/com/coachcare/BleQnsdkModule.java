@@ -534,4 +534,14 @@ public class BleQnsdkModule extends ReactContextBaseJavaModule implements Lifecy
     public void fetchConnectedDeviceInfo() {
         sendConnectedDeviceInfo();
     }
+
+    @ReactMethod
+    public void disconnectDevice() {
+        mQNBleApi.disconnectDevice(connectedDevice, new QNResultCallback() {
+            @Override
+            public void onResult(int code, String msg) {
+                // Do nothing on disconnection result
+            }
+        });
+    }
 }
