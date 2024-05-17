@@ -8,7 +8,6 @@ buildscript {
         maven {
             url 'https://jitpack.io'
             name 'Google'
-            maven { url 'https://jitpack.io' }
         }
     }
     dependencies {
@@ -46,5 +45,5 @@ repositories {
 
 dependencies {
     implementation "com.facebook.react:react-native:+"
-     implementation 'com.github.YolandaQingniu:qnscalesdkX:2.10.0'
+    implementation 'com.github.YolandaQingniu:qnscalesdkX:2.14.0'
 }
