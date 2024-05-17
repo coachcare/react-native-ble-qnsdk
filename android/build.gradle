@@ -6,8 +6,9 @@ buildscript {
     repositories {
         jcenter()
         maven {
-            url 'https://maven.google.com/'
+            url 'https://jitpack.io'
             name 'Google'
+            maven { url 'https://jitpack.io' }
         }
     }
     dependencies {
@@ -38,10 +39,9 @@ repositories {
         url "$projectDir/../../../node_modules/react-native/android"
     }
     maven {
-        url 'https://maven.google.com/'
+        url "https://jitpack.io"
         name 'Google'
     }
-    maven { url "https://jitpack.io" }
 }
 
 dependencies {
