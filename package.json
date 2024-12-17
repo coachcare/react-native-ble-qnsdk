@@ -84,7 +84,7 @@
   "readmeFilename": "README.md",
   "dependencies": {
     "react": "18.3.1",
-    "react-native": "0.76.3"
+    "react-native": "0.76.0"
   },
   "devDependencies": {
     "@semantic-release/changelog": "^6.0.3",
