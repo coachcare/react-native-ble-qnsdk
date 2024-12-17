@@ -21,8 +21,14 @@ const LINKING_ERROR =
   "- You rebuilt the app after installing the package\n" +
   "- You are not using Expo Go\n";
 
+const isTurboModuleEnabled = global.__turboModuleProxy != null;
+
+const BleQNSDKModule = isTurboModuleEnabled
+  ? require("./NativeBleQNSDK").default
+  : NativeModules.BleQnsdk;
+
 const BleQnsdk = NativeModules.BleQnsdk
-  ? NativeModules.BleQnsdk
+  ? BleQNSDKModule
   : new Proxy(
       {},
       {

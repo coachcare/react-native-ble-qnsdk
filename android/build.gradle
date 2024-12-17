@@ -1,50 +1,32 @@
-def safeExtGet(prop, fallback) {
-    rootProject.ext.has(prop) ? rootProject.ext.get(prop) : fallback
-}
+
 
 buildscript {
-    repositories {
-        jcenter()
-        maven {
-            url 'https://maven.google.com/'
-            name 'Google'
-        }
-    }
-    dependencies {
-        classpath 'com.android.tools.build:gradle:7.2.1'
-    }
+  ext.safeExtGet = {prop, fallback ->
+    rootProject.ext.has(prop) ? rootProject.ext.get(prop) : fallback
+  }
+  repositories {
+    google()
+    gradlePluginPortal()
+  }
+  dependencies {
+    classpath("com.android.tools.build:gradle:7.3.1")
+  }
 }
 
 apply plugin: 'com.android.library'
+apply plugin: 'com.facebook.react'
 
 android {
-    compileSdkVersion safeExtGet('compileSdkVersion', 33)
-    buildToolsVersion safeExtGet('buildToolsVersion', '33.0.0')
-
-    defaultConfig {
-        minSdkVersion 23
-        targetSdkVersion safeExtGet('targetSdkVersion', 33)
-    }
-    lintOptions {
-        abortOnError false
-    }
+  compileSdkVersion safeExtGet('compileSdkVersion', 33)
+  namespace "com.coachcare"
 }
 
 repositories {
-    mavenLocal()
-    jcenter()
-    maven {
-        // All of React Native (JS, Obj-C sources, Android binaries) is installed from npm
-        url "$projectDir/../../../node_modules/react-native/android"
-    }
-    maven {
-        url 'https://maven.google.com/'
-        name 'Google'
-    }
-    maven { url "https://jitpack.io" }
+  mavenCentral()
+  google()
 }
 
 dependencies {
-    implementation "com.facebook.react:react-native:+"
-    implementation 'com.github.YolandaQingniu:qnscalesdkX:2.20.1'
+  implementation 'com.facebook.react:react-native'
+  implementation 'com.github.YolandaQingniu:qnscalesdkX:2.20.1'
 }
