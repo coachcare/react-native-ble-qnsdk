@@ -30,3 +30,4 @@ dependencies {
   implementation 'com.facebook.react:react-native'
   implementation 'com.github.YolandaQingniu:qnscalesdkX:2.20.1'
 }
+

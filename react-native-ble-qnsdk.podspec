@@ -1,30 +1,58 @@
+# require "json"
+# package = JSON.parse(File.read(File.join(__dir__, "package.json")))
+# folly_compiler_flags = '-DFOLLY_NO_CONFIG -DFOLLY_MOBILE=1 -DFOLLY_USE_LIBCPP=1 -Wno-comma -Wno-shorten-64-to-32'
+
+# Pod::Spec.new do |s|
+#   s.name = "react-native-ble-qnsdk"
+#   s.version      = package["version"]
+#   s.summary      = package["description"]
+#   s.homepage     = package["homepage"]
+#   s.license      = package["license"]
+#   s.authors      = package["author"]
+#   s.platforms    = { :ios => min_ios_version_supported }
+#   s.source       = { :git => ".git", :tag => "#{s.version}" }
+#   s.source_files = "ios/**/*.{h,m,mm,swift}"
+  
+#   s.dependency "React-Core"
+#   s.dependency "QNSDK", "2.9.0"
+
+
+#   if respond_to?(:install_modules_dependencies, true)
+#     install_modules_dependencies(s)
+#   else
+#     if ENV['RCT_NEW_ARCH_ENABLED'] == '1' then
+#       s.compiler_flags = folly_compiler_flags + " -DRCT_NEW_ARCH_ENABLED=1"
+#       s.pod_target_xcconfig    = {
+#           "HEADER_SEARCH_PATHS" => "\"$(PODS_ROOT)/boost\"",
+#           "OTHER_CPLUSPLUSFLAGS" => "-DFOLLY_NO_CONFIG -DFOLLY_MOBILE=1 -DFOLLY_USE_LIBCPP=1",
+#           "CLANG_CXX_LANGUAGE_STANDARD" => "c++17"
+#       }
+#       s.dependency "React-Codegen"
+#       s.dependency "RCT-Folly"
+#       s.dependency "RCTRequired"
+#       s.dependency "RCTTypeSafety"
+#       s.dependency "ReactCommon/turbomodule/core"
+#     end
+#   end
+# end
+
+
 require "json"
 
 package = JSON.parse(File.read(File.join(__dir__, "package.json")))
 
 Pod::Spec.new do |s|
-  s.name = "react-native-ble-qnsdk"
-  s.version = package["version"]
-  s.summary = package["description"]
-  s.description = <<-DESC
-    YolandaSync is a powerful Bluetooth communication library designed to simplify the process of synchronizing data with Yolanda scales. With a seamless integration into your app, YolandaSync allows you to effortlessly connect to Yolanda scales over Bluetooth and retrieve measurement data with just a few lines of code.
+  s.name            = "react-native-ble-qnsdk"
+  s.version         = package["version"]
+  s.summary         = package["description"]
+  s.description     = package["description"]
+  s.homepage        = "https://github.com/coachcare/react-native-ble-qnsdk"
+  s.license         = package["license"]
+  s.platforms       = { :ios => "11.0" }
+  s.author          = package["author"]
+  s.source          = { :git => package["repository"], :tag => "#{s.version}" }
 
-    Key Features:
-    - Streamlined Bluetooth pairing and communication with Yolanda scales.
-    - Retrieve precise weight and measurement data with ease.
-    - Seamlessly integrate weight measurements into your app's workflow.
+  s.source_files    = "ios/**/*.{h,m,mm,swift}"
 
-    GitHub: https://github.com/coachcare/react-native-ble-qnsdk
-  DESC
-  s.homepage = "https://github.com/coachcare/react-native-ble-qnsdk"
-  s.license = "MIT"
-  s.authors = { "Jeff Drakos" => "jeffdrakos@gmail.com" }
-  s.platforms = { :ios => "11.0" }
-  s.source = { :git => "https://github.com/coachcare/react-native-ble-qnsdk.git", :tag => "#{s.version}" }
-
-  s.source_files = "ios/**/*.{h,m,swift}"
-  s.requires_arc = true
-
-  s.dependency "React"
-  s.dependency "QNSDK", "2.9.0"
+  install_modules_dependencies(s)
 end

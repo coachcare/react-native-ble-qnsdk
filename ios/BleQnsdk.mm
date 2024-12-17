@@ -40,8 +40,12 @@
 #import "QNDeviceSDK.h"
 #import "QNConfig.h"
 #import "QNBleConnectionChangeProtocol.h"
-#import <React/RCTBridgeModule.h>
-#import <React/RCTEventEmitter.h>
+// #import <React/RCTBridgeModule.h>
+// #import <React/RCTEventEmitter.h>
+
+#import "BleQnsdk.h"
+#import <React/RCTBridge.h>
+#import <React/RCTUtils.h>
 
 // Define a constant for the module name
 static NSString *const BleQnsdkKey = @"BleQNSDK";

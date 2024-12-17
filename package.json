@@ -5,10 +5,27 @@
   "description": "A React Native module for handling Bluetooth interactions with Yolanda scales",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
+  "react-native": "lib/index",
+  "source": "lib/index",
+  "files": [
+    "src",
+    "android",
+    "ios",
+    "react-native-ble-qnsdk.podspec",
+    "!android/build",
+    "!ios/build",
+    "!**/__tests__",
+    "!**/__fixtures__",
+    "!**/__mocks__"
+  ],
+
   "codegenConfig": {
     "name": "BleQNSDKSpec",
     "type": "modules",
-    "jsSrcsDir": "src"
+    "jsSrcsDir": "js",
+    "android": {
+      "javaPackageName": "com.coachcare"
+    }
   },
   "release": {
     "branches": [
