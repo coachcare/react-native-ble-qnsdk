@@ -1,6 +1,7 @@
-import <NativeBleQNSDKSpec/NativeBleQNSDKSpec.h>
+#import <React/RCTBridgeModule.h>
+#import "React/RCTEventEmitter.h"
 
-@interface BleQNSDK : NativeBleQNSDKSpecBase <NativeBleQNSDKSpec>
+@interface BleQnsdk : NSObject <RCTBridgeModule>
 
 @end
 
