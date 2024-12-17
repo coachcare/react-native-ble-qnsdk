@@ -5373,12 +5373,12 @@ is-symbol@^1.0.4, is-symbol@^1.1.1:
     has-symbols "^1.1.0"
     safe-regex-test "^1.1.0"
 
-is-typed-array@^1.1.13:
-  version "1.1.13"
-  resolved "https://registry.yarnpkg.com/is-typed-array/-/is-typed-array-1.1.13.tgz#d6c5ca56df62334959322d7d7dd1cca50debe229"
-  integrity sha512-uZ25/bUAlUY5fR4OKT4rZQEBrzQWYV9ZJYGGsUmEJ6thodVJ1HX64ePQ6Z0qPWP+m+Uq6e9UugrE38jeYsDSMw==
+is-typed-array@^1.1.13, is-typed-array@^1.1.14:
+  version "1.1.14"
+  resolved "https://registry.yarnpkg.com/is-typed-array/-/is-typed-array-1.1.14.tgz#205d51d499d5e336f4a3aa480c8ead5ff9e2e3e8"
+  integrity sha512-lQUsHzcTb7rH57dajbOuZEuMDXjs9f04ZloER4QOpjpKcaw4f98BRUrs8aiO9Z4G7i7B0Xhgarg6SCgYcYi8Nw==
   dependencies:
-    which-typed-array "^1.1.14"
+    which-typed-array "^1.1.16"
 
 is-unicode-supported@^0.1.0:
   version "0.1.0"
@@ -6659,9 +6659,9 @@ mime@^2.4.1:
   integrity sha512-USPkMeET31rOMiarsBNIHZKLGgvKc/LrjofAnBlOttf5ajRvqiRA8QsenbcooctK6d6Ts6aqZXBA+XbkKthiQg==
 
 mime@^4.0.0:
-  version "4.0.4"
-  resolved "https://registry.yarnpkg.com/mime/-/mime-4.0.4.tgz#9f851b0fc3c289d063b20a7a8055b3014b25664b"
-  integrity sha512-v8yqInVjhXyqP6+Kw4fV3ZzeMRqEW6FotRsKXjRS5VMTNIuXsdRoAvklpoRgSqXm6o9VNH4/C0mgedko9DdLsQ==
+  version "4.0.6"
+  resolved "https://registry.yarnpkg.com/mime/-/mime-4.0.6.tgz#ca83bec0bcf2a02353d0e02da99be05603d04839"
+  integrity sha512-4rGt7rvQHBbaSOF9POGkk1ocRP16Md1x36Xma8sz8h8/vfCUI2OtEIeCqe4Ofes853x4xDoPiFLIT47J5fI/7A==
 
 mimic-fn@^2.1.0:
   version "2.1.0"
@@ -9013,15 +9013,15 @@ typed-array-buffer@^1.0.2:
     is-typed-array "^1.1.13"
 
 typed-array-byte-length@^1.0.1:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/typed-array-byte-length/-/typed-array-byte-length-1.0.1.tgz#d92972d3cff99a3fa2e765a28fcdc0f1d89dec67"
-  integrity sha512-3iMJ9q0ao7WE9tWcaYKIptkNBuOIcZCCT0d4MRvuuH88fEoEH62IuQe0OtraD3ebQEoTRk8XCBoknUNc1Y67pw==
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/typed-array-byte-length/-/typed-array-byte-length-1.0.2.tgz#6e30b672a4192fdb7476c3b2191b860c62129434"
+  integrity sha512-adiFrvWBKqevPpbl+LErGnoS7juikX0VLSK+s4rcUEqAv2gClx0DB/g0gMUQXMZiG2RhUDUFgQpyXta4AKG9VA==
   dependencies:
-    call-bind "^1.0.7"
+    call-bind "^1.0.8"
     for-each "^0.3.3"
-    gopd "^1.0.1"
-    has-proto "^1.0.3"
-    is-typed-array "^1.1.13"
+    gopd "^1.2.0"
+    has-proto "^1.2.0"
+    is-typed-array "^1.1.14"
 
 typed-array-byte-offset@^1.0.3:
   version "1.0.3"
@@ -9296,7 +9296,7 @@ which-module@^2.0.0:
   resolved "https://registry.yarnpkg.com/which-module/-/which-module-2.0.1.tgz#776b1fe35d90aebe99e8ac15eb24093389a4a409"
   integrity sha512-iBdZ57RDvnOR9AGBhML2vFZf7h8vmBjhoaZqODJBFWHVtKkDmKuHai3cx5PgVMrX5YDNp27AofYbAwctSS+vhQ==
 
-which-typed-array@^1.1.14, which-typed-array@^1.1.16:
+which-typed-array@^1.1.16:
   version "1.1.16"
   resolved "https://registry.yarnpkg.com/which-typed-array/-/which-typed-array-1.1.16.tgz#db4db429c4706feca2f01677a144278e4a8c216b"
   integrity sha512-g+N+GAWiRj66DngFwHvISJd+ITsyphZvD1vChfVg6cEdnzy53GzB3oy0fUNlvhz7H7+MiqhYr26qxQShCpKTTQ==
