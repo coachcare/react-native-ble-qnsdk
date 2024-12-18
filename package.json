@@ -1,32 +1,37 @@
 {
   "name": "react-native-ble-qnsdk",
   "title": "React Native Ble Qnsdk",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "A React Native module for handling Bluetooth interactions with Yolanda scales",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
-  "react-native": "lib/index",
-  "source": "lib/index",
-  "files": [
-    "src",
-    "android",
-    "ios",
-    "react-native-ble-qnsdk.podspec",
-    "!android/build",
-    "!ios/build",
-    "!**/__tests__",
-    "!**/__fixtures__",
-    "!**/__mocks__"
-  ],
-
   "codegenConfig": {
     "name": "BleQNSDKSpec",
     "type": "modules",
-    "jsSrcsDir": "js",
-    "android": {
-      "javaPackageName": "com.coachcare"
-    }
+    "jsSrcsDir": "src"
   },
+  "module": "lib/index.js",
+  "react-native": "src/index.ts",
+  "files": [
+      "/lib",
+      "/src",
+      "/android",
+      "/ios",
+      "*.podspec",
+      "react-native.config.json",
+      "app.plugin.js",
+      "plugin/build",
+      "!ios/build",
+      "!android/build",
+      "!android/gradle",
+      "!android/gradlew",
+      "!android/gradlew.bat",
+      "!android/local.properties",
+      "!**/__tests__",
+      "!**/__fixtures__",
+      "!**/__mocks__",
+      "!**/.*"
+  ],
   "release": {
     "branches": [
       "master"
@@ -82,10 +87,6 @@
   "license": "MIT",
   "licenseFilename": "LICENSE",
   "readmeFilename": "README.md",
-  "dependencies": {
-    "react": "18.3.1",
-    "react-native": "0.76.0"
-  },
   "devDependencies": {
     "@semantic-release/changelog": "^6.0.3",
     "@semantic-release/git": "^10.0.1",
@@ -112,6 +113,11 @@
     "prettier": "2.8.8",
     "react-test-renderer": "18.3.1",
     "typescript": "5.0.4"
+  },
+  "dependencies": {
+   
+    "react": "18.3.1",
+    "react-native": "0.76.0"
   },
   "publishConfig": {
     "registry": "https://npm.pkg.github.com/"

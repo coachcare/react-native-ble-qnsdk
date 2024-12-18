@@ -6,13 +6,14 @@
 
 
 // @interface RTNCalculator : NativeBleQNSDKSpecBase <NativeBleQNSDKSpec>
+#import <CoreBluetooth/CoreBluetooth.h>
+#import <Foundation/Foundation.h>
 
-#import <React/RCTBridgeModule.h>
-#import <ReactCommon/TurboModule.h>
-#import <ReactCommon/RCTTurboModule.h>
+#import <BleManagerSpec/BleManagerSpec.h>
 
-@interface BleQnsdk : NSObject <RCTBridgeModule, RCTTurboModule>
+@interface BleManager : NativeBleManagerSpecBase <NativeBleManagerSpec>
 
-// Add method declarations here if needed, though most of the logic should be in the .mm file.
 
+@interface SpecChecker : NSObject
++ (BOOL)isSpecAvailable;
 @end
