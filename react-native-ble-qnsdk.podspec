@@ -53,17 +53,18 @@ Pod::Spec.new do |s|
   s.source          = { :git => package["repository"], :tag => "#{s.version}" }
 
   s.source_files    = "ios/**/*.{h,m,mm,swift}"
+  s.dependency "QNSDK", "2.9.0"
 
   # if respond_to?(:install_modules_dependencies, true)
   #   install_modules_dependencies(s)
   # else
   #   if ENV['RCT_NEW_ARCH_ENABLED'] == '1' then
-  #     s.compiler_flags = folly_compiler_flags + " -DRCT_NEW_ARCH_ENABLED=1"
-  #     s.pod_target_xcconfig    = {
-  #         "HEADER_SEARCH_PATHS" => "\"$(PODS_ROOT)/boost\"",
-  #         "OTHER_CPLUSPLUSFLAGS" => "-DFOLLY_NO_CONFIG -DFOLLY_MOBILE=1 -DFOLLY_USE_LIBCPP=1",
-  #         "CLANG_CXX_LANGUAGE_STANDARD" => "c++17"
-  #     }
+      # s.compiler_flags = folly_compiler_flags + " -DRCT_NEW_ARCH_ENABLED=1"
+      # s.pod_target_xcconfig    = {
+      #     "HEADER_SEARCH_PATHS" => "\"$(PODS_ROOT)/boost\"",
+      #     "OTHER_CPLUSPLUSFLAGS" => "-DFOLLY_NO_CONFIG -DFOLLY_MOBILE=1 -DFOLLY_USE_LIBCPP=1",
+      #     "CLANG_CXX_LANGUAGE_STANDARD" => "c++17"
+      # }
   #     s.dependency "React-Codegen"
   #     s.dependency "RCT-Folly"
   #     s.dependency "RCTRequired"
@@ -73,11 +74,14 @@ Pod::Spec.new do |s|
   # end
 
   s.static_framework = true
-
+  s.compiler_flags = folly_compiler_flags + " -DRCT_NEW_ARCH_ENABLED=1"
   s.pod_target_xcconfig = {
     'DEFINES_MODULE' => 'YES',
-    'SWIFT_COMPILATION_MODE' => 'wholemodule'
+    "HEADER_SEARCH_PATHS" => "\"$(PODS_ROOT)/boost\"",
+    "OTHER_CPLUSPLUSFLAGS" => "-DFOLLY_NO_CONFIG -DFOLLY_MOBILE=1 -DFOLLY_USE_LIBCPP=1",
+    "CLANG_CXX_LANGUAGE_STANDARD" => "c++17"
   }
+  
       
   install_modules_dependencies(s)
 end
