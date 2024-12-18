@@ -16,7 +16,7 @@ export interface Spec extends TurboModule {
   readonly disconnectDevice: () => Promise<void>;
 
   // Event emitter for value changes
-  readonly onValueChanged: (value: number) => void;
+  readonly emitOnValueChanged: (value: number) => void;
 }
 
 // Exporting the TurboModule instance

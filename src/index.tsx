@@ -65,6 +65,10 @@ function disconnectDevice(): Promise<void> {
   return BleQnsdk.disconnectDevice();
 }
 
+function onValueChanged(): Promise<void> {
+  return BleQnsdk.onValueChanged();
+}
+
 export {
   BleQnsdk,
   buildYolandaUser,
@@ -72,6 +76,7 @@ export {
   stopYolandaScan,
   fetchConnectedDeviceInfo,
   disconnectDevice,
+  onValueChanged,
   IYolandaUser,
   YolandaDeviceInfo,
   TemporaryMeasurementResponse,
