@@ -6,14 +6,21 @@
 
 
 // @interface RTNCalculator : NativeBleQNSDKSpecBase <NativeBleQNSDKSpec>
-#import <CoreBluetooth/CoreBluetooth.h>
-#import <Foundation/Foundation.h>
-
-#import <BleManagerSpec/BleManagerSpec.h>
-
-@interface BleManager : NativeBleManagerSpecBase <NativeBleManagerSpec>
+// #import <CoreBluetooth/CoreBluetooth.h>
+// #import <Foundation/Foundation.h>
 
 
-@interface SpecChecker : NSObject
-+ (BOOL)isSpecAvailable;
+// @interface BleManager : NativeBleManagerSpecBase <NativeBleManagerSpec>
+
+
+// @interface SpecChecker : NSObject
+// + (BOOL)isSpecAvailable;
+// @end
+
+#import <React/RCTBridgeModule.h>
+#import "QNDeviceSDK.h"
+
+
+@interface BleQnsdk : NSObject <RCTBridgeModule>
+
 @end

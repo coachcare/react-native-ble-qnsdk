@@ -73,11 +73,11 @@ Pod::Spec.new do |s|
   #   end
   # end
 
-  s.static_framework = true
+  # s.static_framework = true
   s.compiler_flags = folly_compiler_flags + " -DRCT_NEW_ARCH_ENABLED=1"
   s.pod_target_xcconfig = {
     'DEFINES_MODULE' => 'YES',
-    "HEADER_SEARCH_PATHS" => "\"$(PODS_ROOT)/boost\"",
+    # "HEADER_SEARCH_PATHS" => "\"$(PODS_ROOT)/boost\"",
     "CLANG_CXX_LANGUAGE_STANDARD" => "c++17"
   }
   

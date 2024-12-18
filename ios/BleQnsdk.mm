@@ -43,7 +43,6 @@
 // #import <React/RCTBridgeModule.h>
 // #import <React/RCTEventEmitter.h>
 
-#import "BleQnsdk.h"
 #import <React/RCTBridge.h>
 #import <React/RCTUtils.h>
 
