@@ -81,9 +81,15 @@ Pod::Spec.new do |s|
   s.pod_target_xcconfig = {
     'DEFINES_MODULE' => 'YES',
     # "HEADER_SEARCH_PATHS" => "\"$(PODS_ROOT)/boost\"",
-    "CLANG_CXX_LANGUAGE_STANDARD" => "c++17"
+    "OTHER_CPLUSPLUSFLAGS" => "-DRCT_NEW_ARCH_ENABLED=1",
+    # "CLANG_CXX_LANGUAGE_STANDARD" => "c++17"
   }
-  
+  # s.pod_target_xcconfig    = {
+  #   +    "DEFINES_MODULE" => "YES",
+  #   +    "OTHER_CPLUSPLUSFLAGS" => "-DRCT_NEW_ARCH_ENABLED=1"
+  #   +  }
+    
+  #   +  install_modules_dependencies(s)
       
   install_modules_dependencies(s)
 end
