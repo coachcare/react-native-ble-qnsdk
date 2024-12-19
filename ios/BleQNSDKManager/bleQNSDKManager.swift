@@ -30,7 +30,18 @@ public class BleQnsdk: RCTEventEmitter  {
         bleApi.dataListener = self
     }
     
+    @objc
+    static func requiresMainQueueSetup() -> Bool {
+        return true
+    }
     
+    @objc
+    func getTurboModuleInitParams() -> [AnyHashable: Any] {
+        return [
+            "moduleName": "BleQNSDK",
+            "isEventEmitter": true
+        ]
+    }
     
     @objc func buildUser(_ birthday: String, height: Int, gender: String, id: String, unit: Int, athleteType: Int, resolver resolve: @escaping RCTPromiseResolveBlock,
                          rejecter reject: @escaping RCTPromiseRejectBlock) {
@@ -98,12 +109,16 @@ public class BleQnsdk: RCTEventEmitter  {
     }
 
     @objc
-    func disconnectDevice() {
-        self.bleApi.disconnectDevice(self.device) { (error) in
-            if let error = error {
-                print("Error occurred during disconnection: \(error)")
-            } else {
-                print("Device disconnected successfully")
+    func disconnectDevice() -> Promise<Bool> {
+        return Promise { seal in
+            self.bleApi.disconnectDevice(self.device) { (error) in
+                if let error = error {
+                    print("Error occurred during disconnection: \(error)")
+                    seal.reject(error)
+                } else {
+                    print("Device disconnected successfully")
+                    seal.fulfill(true)
+                }
             }
         }
     }

@@ -1,41 +1,3 @@
-// #import "QNDeviceSDK.h"
-// #import "QNConfig.h"
-// #import "QNBleConnectionChangeProtocol.h"
-// #import <React/RCTBridgeModule.h>
-// #import <React/RCTEventEmitter.h>
-
-// @implementation SpecChecker
-
-// + (BOOL)isSpecAvailable {
-// #ifdef RCT_NEW_ARCH_ENABLED
-//     return YES;
-// #else
-//     return NO;
-// #endif
-// }
-
-// @interface RCT_EXTERN_MODULE(BleQnsdk, NSObject)
-// RCT_EXTERN_METHOD(buildUser:(NSString)birthday height:(NSInteger)height gender:(NSString)gender id:(NSString)id unit:(NSInteger)unit athleteType:(NSInteger)athleteType  resolver: (RCTPromiseResolveBlock)resolve
-//     rejecter: (RCTPromiseRejectBlock)reject)
-// RCT_EXTERN_METHOD(onStartDiscovery:(RCTPromiseResolveBlock)resolve
-//     rejecter: (RCTPromiseRejectBlock)reject)
-// RCT_EXTERN_METHOD(onStopDiscovery:(RCTPromiseResolveBlock)resolve
-//                   rejecter: (RCTPromiseRejectBlock)reject)
-// RCT_EXTERN_METHOD(fetchConnectedDeviceInfo)
-// RCT_EXTERN_METHOD(disconnectDevice)
-
-// - (dispatch_queue_t)methodQueue
-// {
-//     return dispatch_get_main_queue();
-// }
-
-// + (BOOL)requiresMainQueueSetup
-// {
-//     return YES;
-// }
-
-// @end
-
 #import "BleQnsdk.h"
 #import "QNDeviceSDK.h"
 #import "QNConfig.h"
@@ -45,6 +7,7 @@
 
 #import <React/RCTBridge.h>
 #import <React/RCTUtils.h>
+#import <React/RCTTurboModuleManager.h>
 
 // Define a constant for the module name
 static NSString *const BleQnsdkKey = @"BleQNSDK";
@@ -55,7 +18,7 @@ static NSString *const BleQnsdkKey = @"BleQNSDK";
 
 @implementation BleQnsdk
 
-RCT_EXPORT_MODULE(BleQnsdk)
+RCT_EXPORT_MODULE(BleQNSDK)
 
 - (instancetype)init {
   if (self = [super init]) {
@@ -64,9 +27,14 @@ RCT_EXPORT_MODULE(BleQnsdk)
   return self;
 }
 
-// TurboModule-specific implementation
+#ifdef RCT_NEW_ARCH_ENABLED
 - (std::shared_ptr<facebook::react::TurboModule>)getTurboModule:(const facebook::react::ObjCTurboModule::InitParams &)params {
-  return std::make_shared<facebook::react::BleQnsdkSpecJSI>(params);
+  return std::make_shared<facebook::react::NativeBleQNSDKSpecJSI>(params);
+}
+#endif
+
++ (NSString *)moduleName {
+  return @"BleQNSDK";
 }
 
 // Method to build a user
@@ -133,13 +101,28 @@ RCT_EXPORT_METHOD(disconnectDevice) {
   [_deviceSDK disconnectAllDevices];
 }
 
-// Required methods for RCTBridgeModule
-- (dispatch_queue_t)methodQueue {
-  return dispatch_get_main_queue();
+// Method to handle value changes
+RCT_EXPORT_METHOD(onValueChanged:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject) {
+  @try {
+    // Implement the logic to handle value changes
+    resolve(@{@"success": @(YES)});
+  } @catch (NSException *exception) {
+    reject(@"value_changed_error", exception.reason, nil);
+  }
 }
 
+// Required methods for RCTBridgeModule
+// - (dispatch_queue_t)methodQueue {
+//   return dispatch_get_main_queue();
+// }
+
 + (BOOL)requiresMainQueueSetup {
-  return YES;
+  return NO;
 }
 
 @end
+
+Class BleQNSDKCls(void) {
+  return BleQnsdk.class;
+}

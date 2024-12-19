@@ -1,7 +1,6 @@
 import { TurboModule, TurboModuleRegistry } from "react-native";
 
 export interface Spec extends TurboModule {
-  // Promise-based methods
   readonly buildUser: (
     birthday: string,
     height: number,
@@ -14,11 +13,8 @@ export interface Spec extends TurboModule {
   readonly onStopDiscovery: () => Promise<void>;
   readonly fetchConnectedDeviceInfo: () => void;
   readonly disconnectDevice: () => Promise<void>;
-
-  // Event emitter for value changes
-  readonly emitOnValueChanged: (value: number) => void;
+  readonly onValueChanged: () => Promise<void>;
 }
 
-// Exporting the TurboModule instance
-export default TurboModuleRegistry.get<Spec>("BleQNSDK")  as Spec | null;
+export default TurboModuleRegistry.get<Spec>("BleQNSDK") as Spec | null;
 
