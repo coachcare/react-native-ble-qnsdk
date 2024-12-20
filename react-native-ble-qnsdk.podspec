@@ -25,6 +25,21 @@ Pod::Spec.new do |s|
   s.source_files = "ios/**/*.{h,m,swift}"
   s.requires_arc = true
 
-  s.dependency "React"
+  # s.dependency "React"
   s.dependency "QNSDK", "2.9.0"
+
+  s.pod_target_xcconfig = {
+    "CLANG_CXX_LANGUAGE_STANDARD" => "c++17"
+  }
+
+  s.dependency "React-utils"
+  s.subspec "xxxutils" do |ss|
+    ss.dependency "ReactCommon"
+    ss.dependency "React-utils"
+    ss.source_files         = "react/utils/**/*.{cpp,h}"
+    ss.header_dir           = "react/utils"
+    ss.pod_target_xcconfig  = { "HEADER_SEARCH_PATHS" => "\"${PODS_CONFIGURATION_BUILD_DIR}/React-utils/React_utils.framework/Headers\"" }
+  end
+
+  install_modules_dependencies(s)
 end
