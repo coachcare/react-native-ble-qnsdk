@@ -1,10 +1,12 @@
 {
   "name": "react-native-ble-qnsdk",
   "title": "React Native Ble Qnsdk",
-  "version": "1.2.12",
+  "version": "1.2.13",
   "description": "A React Native module for handling Bluetooth interactions with Yolanda scales",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "module": "dist/index.js",
+  "react-native": "src/index.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc"
@@ -15,10 +17,11 @@
     "baseUrl": "https://github.com/coachcare/react-native-ble-qnsdk"
   },
   "files": [
-    "js",
+    "dist",
     "android",
     "ios",
     "react-native-ble-qnsdk.podspec",
+    "react-native.config.js",
     "!android/build",
     "!ios/build",
     "!**/__tests__",

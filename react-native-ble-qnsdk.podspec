@@ -29,7 +29,9 @@ Pod::Spec.new do |s|
   s.dependency "QNSDK", "2.9.0"
 
   s.pod_target_xcconfig = {
-    "CLANG_CXX_LANGUAGE_STANDARD" => "c++17"
+    "CLANG_CXX_LANGUAGE_STANDARD" => "c++17",
+    'DEFINES_MODULE' => 'YES',
+    'SWIFT_COMPILATION_MODE' => 'wholemodule'
   }
 
   s.dependency "React-utils"
