@@ -1,5 +1,75 @@
 import BleQnsdk from './NativeBleQnsdk';
 
-export function multiply(a: number, b: number): number {
-  return BleQnsdk.multiply(a, b);
+import {
+  type ConnectionStatus,
+  type ConnectionStatusEmitter,
+  type DeviceInfoEvent,
+  type FinalMeasurementEvent,
+  type FinalMeasurementResponse,
+  type IYolandaUser,
+  type ScaleEventChangeEvent,
+  type ScaleStateChangeEvent,
+  type TemporaryMeasurementEvent,
+  type TemporaryMeasurementResponse,
+  type YolandaDeviceInfo,
+  type YolandaEventEmitter,
+  YolandaEventTypeEnum,
+} from './types';
+
+import { type EventSubscription } from 'react-native';
+
+function buildYolandaUser(user: IYolandaUser): Promise<void> {
+  return BleQnsdk.buildUser(
+    user.birthday,
+    user.height,
+    user.gender,
+    user.id,
+    user.unit,
+    user.athleteType
+  );
 }
+
+function startYolandaScan(): Promise<void> {
+  return BleQnsdk.onStartDiscovery();
+}
+
+function stopYolandaScan(): Promise<void> {
+  return BleQnsdk.onStopDiscovery();
+}
+
+function fetchConnectedDeviceInfo(): void {
+  return BleQnsdk.fetchConnectedDeviceInfo();
+}
+
+function disconnectDevice(): Promise<void> {
+  return BleQnsdk.disconnectDevice();
+}
+
+function onValueChanged(callback: any): EventSubscription {
+  return BleQnsdk.onValueChanged(callback);
+}
+
+export {
+  BleQnsdk,
+  onValueChanged,
+  buildYolandaUser,
+  startYolandaScan,
+  stopYolandaScan,
+  fetchConnectedDeviceInfo,
+  disconnectDevice,
+  YolandaEventTypeEnum,
+};
+export type {
+  IYolandaUser,
+  YolandaDeviceInfo,
+  TemporaryMeasurementResponse,
+  FinalMeasurementResponse,
+  ConnectionStatus,
+  TemporaryMeasurementEvent,
+  FinalMeasurementEvent,
+  ScaleEventChangeEvent,
+  ScaleStateChangeEvent,
+  DeviceInfoEvent,
+  ConnectionStatusEmitter,
+  YolandaEventEmitter,
+};
