@@ -4,5 +4,5 @@
 #import "QNDeviceSDK.h"
 #import "QNConfig.h"
 #import "QNBleConnectionChangeProtocol.h"
-#import <React/RCTBridgeModule.h>
-#import <React/RCTEventEmitter.h>
+// #import <React/RCTBridgeModule.h>
+// #import <React/RCTEventEmitter.h>

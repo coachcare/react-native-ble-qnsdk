@@ -8,8 +8,8 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-- @interface BleQnsdk : NSObject <NativeBleQnsdkSpec>
-+ @interface BleQnsdk : NativeBleQnsdkSpecBase <NativeBleQnsdkSpec>
+//  @interface BleQnsdk : NSObject <NativeBleQnsdkSpec>
+@interface BleQnsdk : NativeBleQnsdkSpecBase <NativeBleQnsdkSpec>
 
 @end
 
