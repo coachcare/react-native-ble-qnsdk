@@ -1,7 +1,7 @@
 {
   "name": "react-native-ble-qnsdk",
   "title": "React Native Ble Qnsdk",
-  "version": "1.2.16",
+  "version": "1.2.17",
   "description": "A React Native module for handling Bluetooth interactions with Yolanda scales",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -29,7 +29,7 @@
     "!**/__mocks__"
   ],
   "codegenConfig": {
-    "name": "BleQnsdkSpec",
+    "name": "BleQnsdk",
     "type": "modules",
     "jsSrcsDir": "src",
     "android": {
