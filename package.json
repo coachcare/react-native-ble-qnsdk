@@ -29,7 +29,7 @@
     "!**/__mocks__"
   ],
   "codegenConfig": {
-    "name": "BleQnsdk",
+    "name": "BleQnsdkSpec",
     "type": "modules",
     "jsSrcsDir": "src",
     "android": {

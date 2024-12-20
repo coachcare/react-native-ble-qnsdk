@@ -66,6 +66,7 @@
 
 // @end
 
+#import "BleQnsdk.h"
 #import "QNDeviceSDK.h"
 #import "QNConfig.h"
 #import "QNBleConnectionChangeProtocol.h"
@@ -73,8 +74,6 @@
 #import <React/RCTEventEmitter.h>
 #import <ReactCommon/RCTTurboModule.h>
 #import <ReactCommon/TurboModuleUtils.h>
-#import <react/renderer/core/ReactPrimitives.h>
-#import <memory>
 
 // @interface BleQnsdk : NSObject <RCTBridgeModule>
 // @end
