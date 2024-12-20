@@ -76,8 +76,8 @@
 #import <react/renderer/core/ReactPrimitives.h>
 #import <memory>
 
-@interface BleQnsdk : NSObject <RCTBridgeModule>
-@end
+// @interface BleQnsdk : NSObject <RCTBridgeModule>
+// @end
 
 @implementation BleQnsdk
 
@@ -96,15 +96,15 @@ RCT_EXTERN_METHOD(disconnectDevice)
 [self emitOnValueChanged:@(result)];
 
 // Required for React Native modules
-- (dispatch_queue_t)methodQueue
-{
-    return dispatch_get_main_queue();
-}
+// - (dispatch_queue_t)methodQueue
+// {
+//     return dispatch_get_main_queue();
+// }
 
-+ (BOOL)requiresMainQueueSetup
-{
-    return YES;
-}
+// + (BOOL)requiresMainQueueSetup
+// {
+//     return YES;
+// }
 
 // TurboModule support
 - (std::shared_ptr<facebook::react::TurboModule>)getTurboModule:
