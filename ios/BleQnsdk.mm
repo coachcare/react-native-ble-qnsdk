@@ -2,7 +2,11 @@
 #import "QNDeviceSDK.h"
 #import "QNConfig.h"
 #import "QNBleConnectionChangeProtocol.h"
-#import "BleQnsdk-Swift.h" // Auto-generated Swift header
+#import <React/RCTBridgeModule.h>
+#import <ReactCommon/RCTTurboModule.h>
+#import <ReactCommon/TurboModuleUtils.h>
+#import "react-native-ble-qnsdk-Swift.h" // Replace with the correct auto-generated Swift header
+
 
 @implementation BleQnsdk
 RCT_EXPORT_MODULE()
