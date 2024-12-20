@@ -1,6 +1,7 @@
 require "json"
 
 package = JSON.parse(File.read(File.join(__dir__, "package.json")))
+folly_compiler_flags = '-DFOLLY_NO_CONFIG -DFOLLY_MOBILE=1 -DFOLLY_USE_LIBCPP=1 -Wno-comma -Wno-shorten-64-to-32'
 
 Pod::Spec.new do |s|
   s.name = "react-native-ble-qnsdk"
@@ -28,20 +29,23 @@ Pod::Spec.new do |s|
   # s.dependency "React"
   s.dependency "QNSDK", "2.9.0"
 
-  s.pod_target_xcconfig = {
-    "CLANG_CXX_LANGUAGE_STANDARD" => "c++17",
-    'DEFINES_MODULE' => 'YES',
-    'SWIFT_COMPILATION_MODE' => 'wholemodule'
-  }
+  # s.pod_target_xcconfig = {
+  #   "CLANG_CXX_LANGUAGE_STANDARD" => "c++17",
+  #   'DEFINES_MODULE' => 'YES',
+  #   'SWIFT_COMPILATION_MODE' => 'wholemodule'
+  # }
 
-  s.dependency "React-utils"
-  s.subspec "xxxutils" do |ss|
-    ss.dependency "ReactCommon"
-    ss.dependency "React-utils"
-    ss.source_files         = "react/utils/**/*.{cpp,h}"
-    ss.header_dir           = "react/utils"
-    ss.pod_target_xcconfig  = { "HEADER_SEARCH_PATHS" => "\"${PODS_CONFIGURATION_BUILD_DIR}/React-utils/React_utils.framework/Headers\"" }
-  end
+  s.compiler_flags = folly_compiler_flags + " -DRCT_NEW_ARCH_ENABLED=1"
+  s.pod_target_xcconfig    = {
+      "HEADER_SEARCH_PATHS" => "\"$(PODS_ROOT)/boost\"",
+      "OTHER_CPLUSPLUSFLAGS" => "-DFOLLY_NO_CONFIG -DFOLLY_MOBILE=1 -DFOLLY_USE_LIBCPP=1",
+      "CLANG_CXX_LANGUAGE_STANDARD" => "c++17"
+  }
+  s.dependency "React-Codegen"
+  s.dependency "RCT-Folly"
+  s.dependency "RCTRequired"
+  s.dependency "RCTTypeSafety"
+  s.dependency "ReactCommon/turbomodule/core"
 
   install_modules_dependencies(s)
 end
