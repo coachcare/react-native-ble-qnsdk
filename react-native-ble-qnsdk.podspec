@@ -22,7 +22,7 @@ Pod::Spec.new do |s|
   s.platforms = { :ios => "11.0" }
   s.source = { :git => "https://github.com/coachcare/react-native-ble-qnsdk.git", :tag => "#{s.version}" }
 
-  s.source_files = "ios/**/*.{h,m,swift}"
+  s.source_files = "ios/**/*.{h,m,mm,swift}"
   s.requires_arc = true
 
   s.dependency "React"
