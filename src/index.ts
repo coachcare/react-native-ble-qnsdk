@@ -1,38 +1,24 @@
+import BleQnsdk from './NativeBleQnsdk';
+
 import {
-  ConnectionStatus,
-  ConnectionStatusEmitter,
-  DeviceInfoEvent,
-  FinalMeasurementEvent,
-  FinalMeasurementResponse,
-  IYolandaUser,
-  ScaleEventChangeEvent,
-  ScaleStateChangeEvent,
-  TemporaryMeasurementEvent,
-  TemporaryMeasurementResponse,
-  YolandaDeviceInfo,
-  YolandaEventEmitter,
+  type ConnectionStatus,
+  type ConnectionStatusEmitter,
+  type DeviceInfoEvent,
+  type FinalMeasurementEvent,
+  type FinalMeasurementResponse,
+  type IYolandaUser,
+  type ScaleEventChangeEvent,
+  type ScaleStateChangeEvent,
+  type TemporaryMeasurementEvent,
+  type TemporaryMeasurementResponse,
+  type YolandaDeviceInfo,
+  type YolandaEventEmitter,
   YolandaEventTypeEnum,
-} from "./types";
-import { NativeModules, Platform } from "react-native";
+} from './types';
 
-const LINKING_ERROR =
-  `The package 'react-native-ble-qnsdk' doesn't seem to be linked. Make sure: \n\n` +
-  Platform.select({ ios: "- You have run 'pod install'\n", default: "" }) +
-  "- You rebuilt the app after installing the package\n" +
-  "- You are not using Expo Go\n";
+import { type EventSubscription } from 'react-native';
 
-const BleQnsdk = NativeModules.BleQnsdk
-  ? NativeModules.BleQnsdk
-  : new Proxy(
-      {},
-      {
-        get() {
-          throw new Error(LINKING_ERROR);
-        },
-      }
-    );
-
-function buildYolandaUser(user: IYolandaUser): Promise<number> {
+function buildYolandaUser(user: IYolandaUser): Promise<void> {
   return BleQnsdk.buildUser(
     user.birthday,
     user.height,
@@ -59,13 +45,21 @@ function disconnectDevice(): Promise<void> {
   return BleQnsdk.disconnectDevice();
 }
 
+function onValueChanged(callback: any): EventSubscription {
+  return BleQnsdk.onValueChanged(callback);
+}
+
 export {
   BleQnsdk,
+  onValueChanged,
   buildYolandaUser,
   startYolandaScan,
   stopYolandaScan,
   fetchConnectedDeviceInfo,
   disconnectDevice,
+  YolandaEventTypeEnum,
+};
+export type {
   IYolandaUser,
   YolandaDeviceInfo,
   TemporaryMeasurementResponse,
@@ -78,5 +72,4 @@ export {
   DeviceInfoEvent,
   ConnectionStatusEmitter,
   YolandaEventEmitter,
-  YolandaEventTypeEnum,
 };

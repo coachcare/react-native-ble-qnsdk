@@ -14,6 +14,28 @@
     "url": "git+https://github.com/coachcare/react-native-ble-qnsdk.git",
     "baseUrl": "https://github.com/coachcare/react-native-ble-qnsdk"
   },
+  "files": [
+    "src",
+    "dist",
+    "android",
+    "ios",
+    "*.podspec",
+    "!ios/build",
+    "!android/build",
+    "!android/gradle",
+    "!android/gradlew",
+    "!android/gradlew.bat",
+    "!android/local.properties",
+    "!**/__tests__",
+    "!**/__fixtures__",
+    "!**/__mocks__",
+    "!**/.*"
+  ],
+  "codegenConfig": {
+    "name": "RNBleQnsdkSpec",
+    "type": "modules",
+    "jsSrcsDir": "src"
+  },
   "keywords": [
     "react-native",
     "bluetooth",
