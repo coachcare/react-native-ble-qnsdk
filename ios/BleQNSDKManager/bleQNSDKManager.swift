@@ -37,7 +37,7 @@ public class BleQnsdk: RCTEventEmitter  {
         let birthdayDateFormatter = DateFormatter()
         birthdayDateFormatter.dateFormat = "yyyy/MM/dd"
         let date = birthdayDateFormatter.date(from: birthday)
-        
+        print("BUILDINGGGG")
         self.user = bleApi.buildUser(id, height: Int32(height), gender: gender, birthday: date, callback: { error in
             if (error != nil) {
                 self.sendEvent(
