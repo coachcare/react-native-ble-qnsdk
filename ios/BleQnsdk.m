@@ -30,6 +30,5 @@ RCT_EXTERN_METHOD(disconnectDevice)
     return std::make_shared<facebook::react::NativeBleQnsdkSpecJSI>(params);
 }
 
-@end
 
 @end
