@@ -1,8 +1,12 @@
-import { ConnectionStatus, ConnectionStatusEmitter, DeviceInfoEvent, FinalMeasurementEvent, FinalMeasurementResponse, IYolandaUser, ScaleEventChangeEvent, ScaleStateChangeEvent, TemporaryMeasurementEvent, TemporaryMeasurementResponse, YolandaDeviceInfo, YolandaEventEmitter, YolandaEventTypeEnum } from "./types";
+import BleQnsdk from './NativeBleQnsdk';
+import { type ConnectionStatus, type ConnectionStatusEmitter, type DeviceInfoEvent, type FinalMeasurementEvent, type FinalMeasurementResponse, type IYolandaUser, type ScaleEventChangeEvent, type ScaleStateChangeEvent, type TemporaryMeasurementEvent, type TemporaryMeasurementResponse, type YolandaDeviceInfo, type YolandaEventEmitter, YolandaEventTypeEnum } from './types';
+import { type EventSubscription } from 'react-native';
 declare const BleQnsdk: any;
-declare function buildYolandaUser(user: IYolandaUser): Promise<number>;
+declare function buildYolandaUser(user: IYolandaUser): Promise<void>;
 declare function startYolandaScan(): Promise<void>;
 declare function stopYolandaScan(): Promise<void>;
 declare function fetchConnectedDeviceInfo(): void;
 declare function disconnectDevice(): Promise<void>;
-export { BleQnsdk, buildYolandaUser, startYolandaScan, stopYolandaScan, fetchConnectedDeviceInfo, disconnectDevice, IYolandaUser, YolandaDeviceInfo, TemporaryMeasurementResponse, FinalMeasurementResponse, ConnectionStatus, TemporaryMeasurementEvent, FinalMeasurementEvent, ScaleEventChangeEvent, ScaleStateChangeEvent, DeviceInfoEvent, ConnectionStatusEmitter, YolandaEventEmitter, YolandaEventTypeEnum, };
+declare function onValueChanged(callback: any): EventSubscription;
+export { BleQnsdk, onValueChanged, buildYolandaUser, startYolandaScan, stopYolandaScan, fetchConnectedDeviceInfo, disconnectDevice, YolandaEventTypeEnum, };
+export type { IYolandaUser, YolandaDeviceInfo, TemporaryMeasurementResponse, FinalMeasurementResponse, ConnectionStatus, TemporaryMeasurementEvent, FinalMeasurementEvent, ScaleEventChangeEvent, ScaleStateChangeEvent, DeviceInfoEvent, ConnectionStatusEmitter, YolandaEventEmitter, };

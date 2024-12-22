@@ -1,4 +1,3 @@
-import BleQnsdk from './NativeBleQnsdk';
 
 import {
   type ConnectionStatus,
@@ -21,8 +20,8 @@ import { NativeModules, type EventSubscription } from 'react-native';
 
 const BleQnsdk = require("./NativeBleQnsdk").default ?? NativeModules.BleQnsdk;
 
-console.log("1",  NativeModules?.BleQnsdk)
-console.log("2",  BleQnsdk)
+console.log("11111",  NativeModules?.BleQnsdk)
+console.log("22222",  BleQnsdk)
 
 function buildYolandaUser(user: IYolandaUser): Promise<void> {
   return BleQnsdk.buildUser(

@@ -1,38 +1,35 @@
 "use strict";
+var _a;
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.YolandaEventTypeEnum = exports.disconnectDevice = exports.fetchConnectedDeviceInfo = exports.stopYolandaScan = exports.startYolandaScan = exports.buildYolandaUser = exports.BleQnsdk = void 0;
+exports.YolandaEventTypeEnum = exports.BleQnsdk = void 0;
+exports.onValueChanged = onValueChanged;
+exports.buildYolandaUser = buildYolandaUser;
+exports.startYolandaScan = startYolandaScan;
+exports.stopYolandaScan = stopYolandaScan;
+exports.fetchConnectedDeviceInfo = fetchConnectedDeviceInfo;
+exports.disconnectDevice = disconnectDevice;
 const types_1 = require("./types");
 Object.defineProperty(exports, "YolandaEventTypeEnum", { enumerable: true, get: function () { return types_1.YolandaEventTypeEnum; } });
 const react_native_1 = require("react-native");
-const LINKING_ERROR = `The package 'react-native-ble-qnsdk' doesn't seem to be linked. Make sure: \n\n` +
-    react_native_1.Platform.select({ ios: "- You have run 'pod install'\n", default: "" }) +
-    "- You rebuilt the app after installing the package\n" +
-    "- You are not using Expo Go\n";
-const BleQnsdk = react_native_1.NativeModules.BleQnsdk
-    ? react_native_1.NativeModules.BleQnsdk
-    : new Proxy({}, {
-        get() {
-            throw new Error(LINKING_ERROR);
-        },
-    });
+const BleQnsdk = (_a = require("./NativeBleQnsdk").default) !== null && _a !== void 0 ? _a : react_native_1.NativeModules.BleQnsdk;
 exports.BleQnsdk = BleQnsdk;
+console.log("11111", react_native_1.NativeModules === null || react_native_1.NativeModules === void 0 ? void 0 : react_native_1.NativeModules.BleQnsdk);
+console.log("22222", BleQnsdk);
 function buildYolandaUser(user) {
     return BleQnsdk.buildUser(user.birthday, user.height, user.gender, user.id, user.unit, user.athleteType);
 }
-exports.buildYolandaUser = buildYolandaUser;
 function startYolandaScan() {
     return BleQnsdk.onStartDiscovery();
 }
-exports.startYolandaScan = startYolandaScan;
 function stopYolandaScan() {
     return BleQnsdk.onStopDiscovery();
 }
-exports.stopYolandaScan = stopYolandaScan;
 function fetchConnectedDeviceInfo() {
     return BleQnsdk.fetchConnectedDeviceInfo();
 }
-exports.fetchConnectedDeviceInfo = fetchConnectedDeviceInfo;
 function disconnectDevice() {
     return BleQnsdk.disconnectDevice();
 }
-exports.disconnectDevice = disconnectDevice;
+function onValueChanged(callback) {
+    return BleQnsdk.onValueChanged(callback);
+}
